@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: fyp-agent
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: langchain>=0.3.27
+Requires-Dist: langchain-groq>=0.3.6
+Requires-Dist: langgraph>=0.3.34
+Requires-Dist: langgraph-cli[inmem]>=0.1.82
+Requires-Dist: langsmith>=0.3.45
+Requires-Dist: loguru>=0.7.3
+Requires-Dist: pydantic>=2.11.1
+Requires-Dist: pydantic-settings>=2.10.1
+Requires-Dist: pymongo>=4.13.2
+Requires-Dist: pyyaml>=6.0.2
+Requires-Dist: zenml==0.84.0

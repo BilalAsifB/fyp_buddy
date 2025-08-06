@@ -1,0 +1,8 @@
+{
+  "dependencies": ["./pyproject.toml"],
+  "graphs": {
+    "projects_agent": "./src/agent/application/agents/graphs/build_proj_gen_graph.py:projects_agent",
+    "interests_agent": "./src/agent/application/agents/graphs/build_interest_gen_graph.py:interests_agent"
+  },
+  "env": "./.env"
+}
