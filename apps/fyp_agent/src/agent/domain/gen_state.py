@@ -1,11 +1,11 @@
 from pydantic import BaseModel, Field
 
-from .project_info import Project_info
+from .fyp_data import Fyp_data
 
 
-class Projects_list(BaseModel):
+class Gen_State(BaseModel):
     '''
-    List of type Project_info model.
+    Generation state for project idea and interests.
     '''
     departments: list[str] = Field(
         description="The possible departments."
@@ -16,6 +16,6 @@ class Projects_list(BaseModel):
     yos: list[int] = Field(
         description="The possible enrollment years."
     )
-    all_projects: list[Project_info] = Field(
+    all_projects: list[Fyp_data] = Field(
         description="List of project ideas and student data."
     )

@@ -2,13 +2,13 @@ from langgraph.graph import StateGraph
 from langsmith import Client
 from langchain.callbacks.tracers import LangChainTracer
 
-from ....domain.projects_list import Projects_list
-from ....domain.project_info import Project_info
-from .nodes.generate_projects_node import (
+from agent.domain.gen_state import Gen_State
+from agent.domain.fyp_data import Fyp_data
+from agent.application.agents.graphs.nodes import (
     generate_projects_node
 )
 
-from ....config import settings
+from agent.config import settings
 
 from loguru import logger
 
@@ -20,7 +20,7 @@ class ProjectGraphRunner:
     def build_graph(self) -> StateGraph:
         logger.info("[Graph] Building project generation graph...")
 
-        builder = StateGraph(Projects_list)
+        builder = StateGraph(Gen_State)
 
         builder.add_node("generate_projects_node", generate_projects_node)
         builder.set_entry_point("generate_projects_node")
@@ -30,13 +30,13 @@ class ProjectGraphRunner:
 
         return graph
 
-    def generate_projects(self) -> list[Project_info]:
+    def generate_projects(self) -> list[Fyp_data]:
         tracer = LangChainTracer(
             project_name=settings.LANGSMITH_PROJECT,
             client=Client(api_key=settings.LANGSMITH_API_KEY)
         )
 
-        initial_state = Projects_list(
+        initial_state = Gen_State(
             departments=[
                 "Artificial Intelligence", "Cyber Security",
                 "Computer Science", "Software Engineering", "Data Science"
@@ -47,8 +47,11 @@ class ProjectGraphRunner:
         )
 
         logger.info("[Graph] Invoking graph...")
-        final_state = self.graph.invoke(initial_state, config={"callbacks": [tracer]})
-        final_state = Projects_list(**final_state)
+        final_state = self.graph.invoke(
+            initial_state,
+            config={"callbacks": [tracer]}
+        )
+        final_state = Gen_State(**final_state)
         
         logger.info("[Graph] Graph execution complete.")
         logger.debug(len(final_state.all_projects))
