@@ -14,8 +14,7 @@ from steps.infrastructure import (
 
 @pipeline(name="etl_pipeline")
 def etl_pipeline(
-    projects_data_collection_name: str,
-    interests_data_collection_name: str,
+    fyp_data_collection_name: str,
     clear_collection: bool,
 ):
     """
@@ -30,19 +29,19 @@ def etl_pipeline(
     logger.info("Ingesting data into MongoDB...")
     ingest_to_mongodb(
         models=projects_data,
-        collection_name=projects_data_collection_name,
+        collection_name=fyp_data_collection_name,
         clear_collection=clear_collection,
     )
 
-    logger.info("Generating synthetic student interests data...")
-    interests_data = generate_interests_data()
+    # logger.info("Generating synthetic student interests data...")
+    # interests_data = generate_interests_data()
 
-    logger.info("Ingesting data into MongoDB...")
-    ingest_to_mongodb(
-        models=interests_data,
-        collection_name=interests_data_collection_name,
-        clear_collection=clear_collection
-    )
+    # logger.info("Ingesting data into MongoDB...")
+    # ingest_to_mongodb(
+    #     models=interests_data,
+    #     collection_name=interests_data_collection_name,
+    #     clear_collection=clear_collection
+    # )
     # logger.info("Creating positive/negative match pairs from the generated data...")
     # matches = create_matches(
     #     data=data,

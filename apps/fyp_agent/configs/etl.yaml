@@ -1,5 +1,4 @@
 parameters:
-    projects_data_collection_name: "projects_std_profiles"  
-    interests_data_collection_name: "interests_std_profiles"
+    fyp_data_collection_name: "std_profiles"
     clear_collection: True
     

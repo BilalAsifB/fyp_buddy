@@ -49,6 +49,8 @@ You will be given:
 - A list of departments.
 - A list of valid years of study.
 
+**Leave the interests and score fields empty.**
+
 GPA should be a float between 2.0 and 4.0, randomly generated.
 Gender should also be randomly assigned and must be either "male" or "female".
 Generate a list of technical skills relevant to the proposed project idea.
@@ -67,11 +69,13 @@ to trending areas such as agentic AI, generative models, and autonomous systems.
 Projects may also address real-world problems such as brain tumor detection from MRI scans or IoT-based solar power monitoring systems, \
 but they should not be limited to these domains.
 
-Each project idea should be clearly and effectively described in 4 to 5 sentences, providing enough detail to make the concept understandable and actionable.
+Each project idea should be clearly and effectively described in 5 sentences, providing enough detail to make the concept understandable and actionable.
 
 List of previously generated ideas: {previous_ideas}.
 List of departments: {departments}.
 List of years of study: {yos}.
+
+**Leave the interests and score fields empty.**
 
 Format the output strictly as a raw JSON object matching this structure: {format_instructions}
 Do not add any markdown formatting like triple backticks (```), code blocks, or extra quotation marks.

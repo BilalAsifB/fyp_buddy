@@ -4,7 +4,7 @@ from langchain.callbacks.tracers import LangChainTracer
 
 from agent.domain.gen_state import Gen_State
 from agent.domain.fyp_data import Fyp_data
-from agent.application.agents.graphs.nodes import (
+from agent.application.agents.graphs.nodes.generate_projects_node import (
     generate_projects_node
 )
 

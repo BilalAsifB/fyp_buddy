@@ -16,11 +16,9 @@ class Fyp_data(BaseModel):
     domain: str = Field(..., description="Domain of the project")
     idea: str = Field(..., description="Project idea")
     tech_stack: List[str] = Field(
-        ...,
         description="Technical stack required for the project"
     )
     interests: List[str] = Field(
-        ...,
         description=(
             "Interests of the student, i.e types of projects "
             "they are interested in."

@@ -10,8 +10,7 @@ CONFIG_PATH = Path(__file__).parent / "configs" / "etl.yaml"
 
 
 class ETLConfig(BaseModel):
-    projects_data_collection_name: str  
-    interests_data_collection_name: str
+    fyp_data_collection_name: str
     clear_collection: bool
 
 
@@ -26,7 +25,6 @@ if __name__ == "__main__":
     config = load_config(CONFIG_PATH)
 
     etl_pipeline(
-        projects_data_collection_name=config.projects_data_collection_name,
-        interests_data_collection_name=config.interests_data_collection_name,
+        fyp_data_collection_name=config.fyp_data_collection_name,
         clear_collection=config.clear_collection
     )
