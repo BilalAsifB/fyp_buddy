@@ -26,22 +26,22 @@ def etl_pipeline(
     logger.info("Generating synthetic student profiles data...")
     projects_data = generate_projects_data()
 
-    # logger.info("Ingesting data into MongoDB...")
-    # ingest_to_mongodb(
-    #     models=projects_data,
-    #     collection_name=fyp_data_collection_name,
-    #     clear_collection=clear_collection,
-    # )
+    logger.info("Ingesting data into MongoDB...")
+    ingest_to_mongodb(
+        models=projects_data,
+        collection_name=fyp_data_collection_name,
+        clear_collection=clear_collection,
+    )
 
     logger.info("Generating synthetic student interests data...")
     interests_data = generate_interests_data()
 
-    # logger.info("Ingesting data into MongoDB...")
-    # ingest_to_mongodb(
-    #     models=interests_data,
-    #     collection_name=fyp_data_collection_name,
-    #     clear_collection=False  # append
-    # )
+    logger.info("Ingesting data into MongoDB...")
+    ingest_to_mongodb(
+        models=interests_data,
+        collection_name=fyp_data_collection_name,
+        clear_collection=False  # append
+    )
 
     # logger.info("Creating positive/negative match pairs from the generated data...")
     # matches = create_matches(

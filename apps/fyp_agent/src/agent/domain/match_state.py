@@ -4,7 +4,7 @@ from typing import List
 from .fyp_data import Fyp_data
 
 
-class State(BaseModel):
+class Match_State(BaseModel):
     '''
     Langraph input state.
     '''
