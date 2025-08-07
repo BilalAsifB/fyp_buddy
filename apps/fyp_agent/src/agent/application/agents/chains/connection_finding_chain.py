@@ -2,10 +2,12 @@ from langchain.output_parsers import PydanticOutputParser
 from langchain_core.output_parsers.json import JsonOutputParser
 from langchain_groq import ChatGroq
 
-from ...agents.prompts import pull_connection_finding_prompt
+from agent.application.agents.prompts.pull_connection_finding_prompt import (
+    pull_connection_finding_prompt
+)
 
-from ....domain.connection_llm_output import Connection_llm_output
-from ....config import settings
+from agent.domain.connection_llm_output import Connection_llm_output
+from agent.config import settings
 
 from loguru import logger
 

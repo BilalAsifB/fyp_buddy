@@ -43,17 +43,3 @@ def etl_pipeline(
         clear_collection=False  # append
     )
 
-    # logger.info("Creating positive/negative match pairs from the generated data...")
-    # matches = create_matches(
-    #     data=data,
-    #     model_id=matcher_model_id,
-    # )
-
-    # logger.info("Ingesting matches into MongoDB...")
-    # ingest_to_mangodb(
-    #     model=matches,
-    #     collection_name=matches_collection_name,
-    #     clear_collection=clear_collection,
-    # )
-
-    # logger.info("ETL pipeline completed successfully.")
