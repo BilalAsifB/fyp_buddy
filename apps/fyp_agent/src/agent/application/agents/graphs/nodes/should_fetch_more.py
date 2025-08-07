@@ -1,13 +1,16 @@
 from langgraph.graph import END
 
 from .fetch_data_node import fetch_data_node
-from .display_results_node import display_results_node
 
-from .....domain.state import State
+from agent.domain.match_state import Match_State
+
+from loguru import logger
 
 
-def should_fetch_more(state: State):
+def should_fetch_more(state: Match_State):
     if state.done:
-        return display_results_node
+        logger.debug(f"Done: {state.done} -> Returning END.")
+        return END
     else:
-        fetch_data_node
+        logger.debug(f"Done: {state.done} -> Returning fetch_data_node.")
+        return fetch_data_node
