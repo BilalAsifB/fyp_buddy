@@ -43,7 +43,7 @@ class ProjectGraphRunner:
             ],
             previous_ideas=[],
             yos=[2019, 2020, 2021, 2022],
-            all_projects=[]
+            all_data=[]
         )
 
         logger.info("[Graph] Invoking graph...")
@@ -54,9 +54,9 @@ class ProjectGraphRunner:
         final_state = Gen_State(**final_state)
         
         logger.info("[Graph] Graph execution complete.")
-        logger.debug(len(final_state.all_projects))
+        logger.debug(len(final_state.all_data))
 
-        return final_state.all_projects
+        return final_state.all_data
 
 
 # This is required by langgraph.yaml or langgraph.json to work.

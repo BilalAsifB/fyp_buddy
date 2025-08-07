@@ -97,6 +97,8 @@ You will be given:
 - A list of departments.
 - A list of valid years of study.
 
+**Leave the title, idea, tech_stack and score fields empty.**
+
 GPA should be a float between 2.0 and 4.0, randomly generated.
 Gender should also be randomly assigned and must be either "male" or "female".
 Generate a list of technical skills relevant to the students interests.
@@ -114,6 +116,8 @@ Generate a list of 4 interests. These may include:
 
 List of departments: {departments}.
 List of years of study: {yos}.
+
+**Leave the title, idea, tech_stack and score fields empty.**
 
 Format the output strictly as a raw JSON object matching this structure: {format_instructions}
 Do not add any markdown formatting like triple backticks (```), code blocks, or extra quotation marks.

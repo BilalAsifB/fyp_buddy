@@ -5,7 +5,7 @@ from langchain.prompts import ChatPromptTemplate
 from langsmith import Client
 from langsmith.utils import LangSmithUserError
 
-from ....config import settings
+from agent.config import settings
 
 
 def pull_interest_gen_prompt() -> ChatPromptTemplate:

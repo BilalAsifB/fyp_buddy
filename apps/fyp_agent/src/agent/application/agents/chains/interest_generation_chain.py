@@ -2,10 +2,12 @@ from langchain.output_parsers import PydanticOutputParser
 from langchain_core.output_parsers.json import JsonOutputParser
 from langchain_groq import ChatGroq
 
-from ...agents.prompts.pull_interest_prompt import pull_interest_gen_prompt
+from agent.application.agents.prompts.pull_interest_prompt import (
+    pull_interest_gen_prompt,
+)
 
-from ....domain.interests_list import Interests_list
-from ....config import settings
+from agent.domain.gen_state import Gen_State
+from agent.config import settings
 
 from loguru import logger
 
@@ -13,7 +15,7 @@ from loguru import logger
 def build_interest_generation_chain():
     logger.info("[Chain] Building interest generation chain...")
 
-    parser = PydanticOutputParser(pydantic_object=Interests_list)
+    parser = PydanticOutputParser(pydantic_object=Gen_State)
     format_instructions = parser.get_format_instructions()
 
     llm = ChatGroq(

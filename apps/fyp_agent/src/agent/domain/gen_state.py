@@ -16,6 +16,7 @@ class Gen_State(BaseModel):
     yos: list[int] = Field(
         description="The possible enrollment years."
     )
-    all_projects: list[Fyp_data] = Field(
-        description="List of project ideas and student data."
+    all_data: list[Fyp_data] = Field(
+        description="List of student data containing their project ideas/interests,"
+        "and metadata."
     )

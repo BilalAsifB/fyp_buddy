@@ -29,14 +29,14 @@ def generate_projects_node(state: Gen_State) -> Gen_State:
 
         logger.debug(f"Result of batch {i+1}/5:\n{result}")
 
-        for proj in result["all_projects"]:
+        for proj in result["all_data"]:
             proj["id"] = generate_random_hex(16)
             proj["metadata"]["id"] = generate_random_hex(16)
 
         state.previous_ideas.extend(
-            [proj["title"] for proj in result["all_projects"]]
+            [proj["title"] for proj in result["all_data"]]
         )
-        state.all_projects.extend(result["all_projects"])
+        state.all_data.extend(result["all_data"])
 
         time.sleep(random.randint(30, 60))  # throttle requests
 
