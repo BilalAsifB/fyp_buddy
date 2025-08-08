@@ -10,6 +10,8 @@ from agent.application.agents.graphs.helpers.get_norm import (
 import time
 import random
 
+import groq
+
 
 def find_connection_node(state: Match_State) -> Match_State:
     chain = connection_finding_chain()
@@ -24,13 +26,15 @@ def find_connection_node(state: Match_State) -> Match_State:
         }
         for data in state.all_data
     ]
+    try:
+        result = chain.invoke({"input": input_to_llm})
+    except groq.InternalServerError as e:
+        print("Groq failed:", e)
 
-    result = chain.invoke({"input": input_to_llm})
+    # norm = get_norm(result.values)
 
-    norm = get_norm(result.values)
-
-    for data in state.all_data:
-        data.score = result[data.id] / norm * 100  # norm and converting to %
+    # for data in state.all_data:
+    #     data.score = result[data.id] / norm * 100  # norm and converting to %
 
     time.sleep(random.randint(15, 30))  # throttling requests
 

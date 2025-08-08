@@ -1,4 +1,4 @@
-from langgraph.graph import StateGraph
+from langgraph.graph import StateGraph, END
 from langsmith import Client
 from langchain.callbacks.tracers import LangChainTracer
 
@@ -37,7 +37,34 @@ class MatcherGraphRunner():
         builder.add_edge("fetch_data_node", "find_connection_node")
         builder.add_conditional_edges(
             "find_connection_node",
-            should_fetch_more
+            should_fetch_more,
+            {
+                "
+    def build_graph(self) -> StateGraph:
+        logger.info("[Graph] Building match finding graph...")
+
+        builder = StateGraph(Match_State)
+        
+        builder.add_node("fetch_data_node", fetch_data_node)
+        builder.add_node("find_connection_node", find_connection_node)
+        builder.add_node("should_fetch_more", should_fetch_more)
+
+        builder.set_entry_point("fetch_data_node")
+        builder.add_edge("fetch_data_node", "find_connection_node")
+        builder.add_conditional_edges(
+            "find_connection_node",
+            conditional_function=should_fetch_more,
+            {
+                "fetch_more": "fetch_data_node",
+                "end": END
+            }
+        )
+        
+        graph = builder.compile()
+
+        return graph": "fetch_data_node",
+                "end": END
+            }
         )
         
         graph = builder.compile()
@@ -65,5 +92,10 @@ class MatcherGraphRunner():
 
         logger.info("[Graph] Graph execution complete.")
         logger.debug(len(final_state.all_data))
+        logger.debug(final_state.all_data)
 
         return final_state
+
+
+# This is required by langgraph.yaml or langgraph.json to work.
+match_agent = MatcherGraphRunner().graph
