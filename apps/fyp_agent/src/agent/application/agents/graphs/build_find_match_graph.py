@@ -31,18 +31,17 @@ class MatcherGraphRunner():
         
         builder.add_node("fetch_data_node", fetch_data_node)
         builder.add_node("find_connection_node", find_connection_node)
-        builder.add_node("should_fetch_more", should_fetch_more)
 
         builder.set_entry_point("fetch_data_node")
         builder.add_edge("fetch_data_node", "find_connection_node")
-        builder.add_edge("find_connection_node", "should_fetch_more")
-        # builder.add_conditional_edges(
-        #     "should_fect_more",
-        #     {
-        #         "fetch_more": "fetch_data_node",
-        #         "end": END
-        #     }
-        # )
+        builder.add_conditional_edges(
+            "find_connection_node",
+            should_fetch_more,
+            {
+                "fetch_more": "fetch_data_node",
+                "end": END
+            }
+        )
         
         graph = builder.compile()
 
