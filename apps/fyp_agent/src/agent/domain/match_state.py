@@ -11,3 +11,6 @@ class Match_State(BaseModel):
     all_data: List[Fyp_data] = Field(..., description="List fyp data")
     query: Fyp_data = Field(..., description="Query input.")
     done: bool = Field(..., description="Indicator of all data procssed.")
+    offset: int = Field(0, description="Offset for pagination.")
+    limit: int = Field(20, description="Limit for pagination.")
+    
