@@ -15,7 +15,7 @@ if __name__ == "__main__":
         title="",
         domain="Genetics and AI",
         idea="Developing a deep learning model that detects the chances of offspring inheriting genetic diseases based on parental genetics.",
-        tech_stack = [
+        tech_stack=[
             "Python",
             "pandas", "numpy", "biopython", "pysam", "scikit-learn",
             "matplotlib", "seaborn", "plotly",

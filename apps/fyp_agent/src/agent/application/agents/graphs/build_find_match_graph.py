@@ -56,7 +56,9 @@ class MatcherGraphRunner():
         initial_state = Match_State(
             all_data=[],
             query=query,
-            done=False
+            done=False,
+            offset=0,
+            limit=20
         )
 
         logger.info("[Graph] Invoking graph...")

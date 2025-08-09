@@ -15,7 +15,11 @@ def fetch_data_node(state: Match_State) -> Match_State:
         model=Fyp_data,
         collection_name="std_profiles"
     ) as service:
-        data = service.fetch_documents(limit=20, query={})
+        data = service.fetch_documents(
+            limit=state.limit,
+            offset=state.offset,
+            query={}
+        )
 
     logger.info("Data fetched.")
 
@@ -23,6 +27,7 @@ def fetch_data_node(state: Match_State) -> Match_State:
         logger.debug(f"{len(data)} profiles fetched.")
 
         state.all_data = data
+        state.offset += len(data)
         state.done = False
     else:
         logger.debug("No prfiles fetched.")
