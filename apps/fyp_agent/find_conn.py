@@ -3,6 +3,7 @@ from agent.application.agents.graphs.build_find_match_graph import (
 )
 
 from agent.domain.fyp_data import Fyp_data
+from agent.domain.match_state import Match_State
 from agent.domain.metadata import Metadata
 from agent.utils import generate_random_hex
 
@@ -50,3 +51,11 @@ if __name__ == "__main__":
     )
 
     result = match.find_matches(query)
+
+    top_matches = result.all_data
+
+    print("Top Matches:")
+    for match in top_matches:
+        print(f"ID: {match.id}, Score: {match.score}, Title: {match.title}")
+        print(f"Metadata: {match.metadata}")
+        print("-" * 40) 

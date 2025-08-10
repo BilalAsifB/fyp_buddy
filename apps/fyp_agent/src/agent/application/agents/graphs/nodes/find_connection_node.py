@@ -6,6 +6,8 @@ from agent.application.agents.chains.connection_finding_chain import (
 import time
 import random
 
+from loguru import logger
+
 import groq
 
 

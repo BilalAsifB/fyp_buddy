@@ -1,25 +1,25 @@
 from langchain_core.prompts import ChatPromptTemplate
 from src.agent.domain.prompts import (
-    INTEREST_GENERATION_SYSTEM_PROMPT,
-    INTEREST_GENERATION_USER_PROMPT,
+    CONNECTION_FINDING_SYSTEM_PROMPT,
+    CONNECTION_FINDING_USER_PROMPT,
     Prompt
 )
 
 prompt = ChatPromptTemplate.from_messages([
-    ("system", INTEREST_GENERATION_SYSTEM_PROMPT),
-    ("human", INTEREST_GENERATION_USER_PROMPT)
+    ("system", CONNECTION_FINDING_SYSTEM_PROMPT),
+    ("human", CONNECTION_FINDING_USER_PROMPT)
 ])
 
 Prompt(
-    prompt_identifier="interest_generation",
+    prompt_identifier="finding_connections",
     prompt=prompt,
     is_public=False,
     tags=[
         "generation",
         "qwen/qwen3-32b",
-        "v1.5"
+        "v1.1"
     ],
     description=(
-        "Prompt to generate synthetic student interests."
+        "Prompt to connect similar student profiles."
     )
 )

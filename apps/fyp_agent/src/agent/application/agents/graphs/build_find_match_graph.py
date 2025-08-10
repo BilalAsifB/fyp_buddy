@@ -16,6 +16,9 @@ from agent.application.agents.graphs.nodes.find_connection_node import (
 from agent.application.agents.graphs.nodes.should_fetch_more import (
     should_fetch_more
 )
+from agent.application.agents.graphs.nodes.extract_top_five_node import (
+    extract_top_five_node
+)
 
 from loguru import logger
 
@@ -31,6 +34,7 @@ class MatcherGraphRunner():
         
         builder.add_node("fetch_data_node", fetch_data_node)
         builder.add_node("find_connection_node", find_connection_node)
+        builder.add_node("extract_top_five_node", extract_top_five_node)
 
         builder.set_entry_point("fetch_data_node")
         builder.add_edge("fetch_data_node", "find_connection_node")
@@ -39,9 +43,10 @@ class MatcherGraphRunner():
             should_fetch_more,
             {
                 "fetch_more": "fetch_data_node",
-                "end": END
+                "extract": "extract_top_five_node"
             }
         )
+        builder.set_finish_point("extract_top_five_node")
         
         graph = builder.compile()
 
