@@ -42,8 +42,8 @@ class MatcherGraphRunner():
             "find_connection_node",
             should_fetch_more,
             {
-                "fetch_more": "fetch_data_node",
-                "extract": "extract_top_five_node"
+                "extract": "extract_top_five_node",
+                "fetch_more": "fetch_data_node"
             }
         )
         builder.set_finish_point("extract_top_five_node")
