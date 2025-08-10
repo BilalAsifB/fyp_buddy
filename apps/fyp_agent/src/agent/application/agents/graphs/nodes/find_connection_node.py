@@ -31,11 +31,6 @@ def find_connection_node(state: Match_State) -> Match_State:
     except groq.InternalServerError as e:
         print("Groq failed:", e)
 
-    # norm = get_norm(result.values)
-
-    # for data in state.all_data:
-    #     data.score = result[data.id] / norm * 100  # norm and converting to %
-
     time.sleep(random.randint(15, 30))  # throttling requests
 
     return state
