@@ -22,13 +22,18 @@ def find_connection_node(state: Match_State) -> Match_State:
         }
         for data in state.all_data
     ]
+    
+    result = {}
     try:
         result = chain.invoke({"input": input_to_llm})
     except groq.InternalServerError as e:
         print("Groq failed:", e)
 
     for data in state.all_data:
-        data.score = result[data.id]
+        if data.id in result:
+            data.score = result[data.id]
+        else:
+            data.score = 0.0
 
     time.sleep(random.randint(15, 30))  # throttling requests
 
