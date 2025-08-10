@@ -3,10 +3,6 @@ from agent.application.agents.chains.connection_finding_chain import (
     connection_finding_chain
 )
 
-from agent.application.agents.graphs.helpers.get_norm import (
-    get_norm
-)
-
 import time
 import random
 
@@ -30,6 +26,9 @@ def find_connection_node(state: Match_State) -> Match_State:
         result = chain.invoke({"input": input_to_llm})
     except groq.InternalServerError as e:
         print("Groq failed:", e)
+
+    for data in state.all_data:
+        data.score = result[data.id]
 
     time.sleep(random.randint(15, 30))  # throttling requests
 
