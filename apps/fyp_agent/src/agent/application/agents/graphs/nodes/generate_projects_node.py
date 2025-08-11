@@ -30,8 +30,9 @@ def generate_projects_node(state: Gen_State) -> Gen_State:
         logger.debug(f"Result of batch {i+1}/5:\n{result}")
 
         for proj in result["all_data"]:
-            proj["id"] = generate_random_hex(16)
-            proj["metadata"]["id"] = generate_random_hex(16)
+            id = generate_random_hex(16)
+            proj["id"] = id
+            proj["metadata"]["id"] = id
 
         state.previous_ideas.extend(
             [proj["title"] for proj in result["all_data"]]

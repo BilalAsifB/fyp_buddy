@@ -63,7 +63,8 @@ class MatcherGraphRunner():
             query=query,
             done=False,
             offset=0,
-            limit=20
+            limit=20,
+            results=[]
         )
 
         logger.info("[Graph] Invoking graph...")
@@ -74,8 +75,6 @@ class MatcherGraphRunner():
         final_state = Match_State(**final_state)
 
         logger.info("[Graph] Graph execution complete.")
-        logger.debug(len(final_state.all_data))
-        logger.debug(final_state.all_data)
 
         return final_state
 

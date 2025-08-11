@@ -127,52 +127,70 @@ Only return the JSON object — no surrounding text, no explanation, and no code
 CONNECTION_FINDING_SYSTEM_PROMPT = """\
 You are a student matching system that scores compatibility between student profiles for Final Year Projects (FYP).
 
-TASK: Score each candidate profile against the query profile using 5 criteria, each scored 0.0-1.0.
+TASK:
+- For each candidate profile, score against the query profile using 5 fixed criteria.
+- Each criterion is scored between 0.0 and 1.0 with exactly one decimal place.
+- The FINAL SCORE is the sum of all 5 criteria (maximum 5.0, minimum 0.0).
 
 SCORING CRITERIA:
-1. IDEA_SIMILARITY (0.0-1.0): How similar are their project ideas?
+1. IDEA_SIMILARITY (0.0–1.0): 0.0 = completely unrelated, 0.5 = somewhat similar, 1.0 = identical idea.
+2. IDEA_INTEREST_MATCH (0.0–1.0): 0.0 = no alignment, 0.5 = partial match, 1.0 = strong alignment.
+3. SHARED_INTERESTS (0.0–1.0): 0.0 = no shared interests, 0.5 = some overlap, 1.0 = many shared interests.
+4. SKILL_MATCH (0.0–1.0): 0.0 = no relevant skills, 0.5 = partial overlap, 1.0 = full match to required tech stack.
+5. OVERALL_COMPATIBILITY (0.0–1.0): 0.0 = poor fit, 0.5 = moderate fit, 1.0 = excellent fit.
 
-2. IDEA_INTEREST_MATCH (0.0-1.0): How well do candidate's interests align with query's project idea?
+MISSING DATA RULES:
+- If `idea` is missing: IDEA_SIMILARITY = 0.0
+- If `tech_stack` is missing: SKILL_MATCH = based only on any matching general skills (max 0.5 if partial match, else 0.0)
+- If `interests` are missing: SHARED_INTERESTS and IDEA_INTEREST_MATCH = 0.0
+- All other criteria must still be scored using available context.
+"""
 
-3. SHARED_INTERESTS (0.0-1.0): Common interests between both profiles.
 
-4. SKILL_MATCH (0.0-1.0): How well do candidate's skills match query's required tech stack?
-
-5. OVERALL_COMPATIBILITY (0.0-1.0): General alignment in technical level, ambition, and project approach.
-
-FINAL SCORE: Sum all 5 scores (maximum: 5.0)
-
-HANDLE MISSING DATA:
-- If idea is missing: score IDEA_SIMILARITY as 0.0
-- If tech_stack is missing: score SKILL_MATCH based on general skill relevance
-- If interests are missing: score related criteria as 0.0
-
-Be consistent and objective in your scoring."""
 
 CONNECTION_FINDING_USER_PROMPT = """\
 QUERY PROFILE: The student looking for matches
 CANDIDATE PROFILES: Students to be scored against the query
 
-INPUT DATA: {input}
+INPUT DATA:
+{input}
 
 INSTRUCTIONS:
-1. Identify the query profile (first in the list)
-2. Score each remaining profile against the query using the 5 criteria
-3. Calculate total score (sum of all 5 criteria)
-4. Return ONLY a JSON object with profile IDs and their total scores
+1. Identify the query profile (first in the list).
+2. Score each remaining profile against the query using the 5 criteria.
+3. Calculate the total score (sum of all 5 criteria).
+4. Return the result as a SINGLE JSON OBJECT where:
+   - Each **key** is the profile_id as a string EXACTLY as it appears in the input.
+   - Each **value** is the score (a float).
+5. The JSON object MUST NOT contain any other fields, arrays, or nested structures.
+6. DO NOT return:
+   - Arrays of IDs
+   - Arrays of scores
+   - Any text outside the JSON object
+7. All scores should be between 0.5 and 3.0.
 
-REQUIRED OUTPUT FORMAT:
+OUTPUT RULES:
+- Output only a single valid JSON object.
+- Keys = profile IDs exactly as in input.
+- Values = final scores (sum of 5 criteria) as floats with one decimal place.
+- No arrays, lists, or nested structures.
+- No trailing commas.
+- No text outside the JSON object.
+
+OUTPUT FORMAT: {format_instructions}
+
+VALID OUTPUT EXAMPLE:
 {{
-  "profile_id_1": 2.3,
-  "profile_id_2": 4.1,
-  "profile_id_3": 1.7
+  "6893f2da21073051200f9f5f": 0.8,
+  "6893f2da21073051200f9f60": 0.7,
+  "6893f2da21073051200f9f61": 1.2
 }}
 
-CRITICAL: 
-- Return ONLY the JSON object
-- No markdown formatting, backticks, or explanations
-- Use exact profile IDs from input data
-- Scores should be realistic (most will be 1.0-3.0 range)
-- Higher scores indicate better matches
+INVALID OUTPUT EXAMPLES (DO NOT PRODUCE):
+{{"id": ["abc", "def"], "score": [1.0, 2.0]}}
+[{{"id": "abc", "score": 1.0}}, {{"id": "def", "score": 2.0}}]
 
-{format_instructions}"""
+CRITICAL:
+- Output must match the VALID OUTPUT EXAMPLE exactly in structure.
+- No explanations, no markdown, no extra text — only the JSON object.
+"""

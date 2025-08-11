@@ -29,8 +29,9 @@ def generate_interests_node(state: Gen_State) -> Gen_State:
         logger.debug(f"Result of batch {i+1}/5:\n{result}")
 
         for interest in result["all_data"]:
-            interest["id"] = generate_random_hex(16)
-            interest["metadata"]["id"] = generate_random_hex(16)
+            id = generate_random_hex(16)
+            interest["id"] = id
+            interest["metadata"]["id"] = id
 
         state.all_data.extend(result["all_data"])
 

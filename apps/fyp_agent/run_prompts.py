@@ -17,7 +17,7 @@ Prompt(
     tags=[
         "generation",
         "qwen/qwen3-32b",
-        "v1.1"
+        "v1.4"
     ],
     description=(
         "Prompt to connect similar student profiles."

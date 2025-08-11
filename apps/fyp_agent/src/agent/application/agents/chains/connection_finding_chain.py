@@ -20,11 +20,11 @@ def connection_finding_chain():
 
     llm = ChatGroq(
         api_key=settings.GROQ_API_KEY,
-        model="qwen/qwen3-32b",
-        temperature=0.1,
-        reasoning_format="hidden",
+        model="llama-3.1-8b-instant",
+        temperature=0,
+        # reasoning_format="hidden",
         model_kwargs={
-            "top_p": 0.8,
+            "top_p": 0.9,
             "response_format": {"type": "json_object"}
         }
     )
