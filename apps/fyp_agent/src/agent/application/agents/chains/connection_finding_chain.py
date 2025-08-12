@@ -22,9 +22,10 @@ def connection_finding_chain():
         api_key=settings.GROQ_API_KEY,
         model="llama-3.1-8b-instant",
         temperature=0,
+        # reasoning_effort="default",
         # reasoning_format="hidden",
         model_kwargs={
-            "top_p": 0.9,
+            "top_p": 0.95,
             "response_format": {"type": "json_object"}
         }
     )

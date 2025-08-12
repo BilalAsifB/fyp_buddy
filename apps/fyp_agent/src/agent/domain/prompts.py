@@ -146,8 +146,6 @@ MISSING DATA RULES:
 - All other criteria must still be scored using available context.
 """
 
-
-
 CONNECTION_FINDING_USER_PROMPT = """\
 QUERY PROFILE: The student looking for matches
 CANDIDATE PROFILES: Students to be scored against the query
@@ -169,26 +167,7 @@ INSTRUCTIONS:
    - Any text outside the JSON object
 7. All scores should be between 0.5 and 3.0.
 
-OUTPUT RULES:
-- Output only a single valid JSON object.
-- Keys = profile IDs exactly as in input.
-- Values = final scores (sum of 5 criteria) as floats with one decimal place.
-- No arrays, lists, or nested structures.
-- No trailing commas.
-- No text outside the JSON object.
-
 OUTPUT FORMAT: {format_instructions}
-
-VALID OUTPUT EXAMPLE:
-{{
-  "6893f2da21073051200f9f5f": 0.8,
-  "6893f2da21073051200f9f60": 0.7,
-  "6893f2da21073051200f9f61": 1.2
-}}
-
-INVALID OUTPUT EXAMPLES (DO NOT PRODUCE):
-{{"id": ["abc", "def"], "score": [1.0, 2.0]}}
-[{{"id": "abc", "score": 1.0}}, {{"id": "def", "score": 2.0}}]
 
 CRITICAL:
 - Output must match the VALID OUTPUT EXAMPLE exactly in structure.

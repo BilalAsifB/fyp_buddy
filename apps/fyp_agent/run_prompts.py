@@ -15,9 +15,9 @@ Prompt(
     prompt=prompt,
     is_public=False,
     tags=[
-        "generation",
-        "qwen/qwen3-32b",
-        "v1.4"
+        "find_connections",
+        "llama-3.1-8b-instant",
+        "v1.5"
     ],
     description=(
         "Prompt to connect similar student profiles."

@@ -52,11 +52,4 @@ if __name__ == "__main__":
 
     result = match.find_matches(query)
 
-    top_matches = result.results
-
-    print("Top Matches:")
-    for match in top_matches:
-        print(match)
-        # print(f"ID: {match.id}, Score: {match.score}, Title: {match.title}")
-        # print(f"Metadata: {match.metadata}")
-        print("-" * 40) 
+    print(result)

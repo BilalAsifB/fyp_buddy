@@ -9,7 +9,7 @@ def fetch_data_node(state: Match_State) -> Match_State:
     '''
     Fetch fyp data from mongoDB.
     '''
-    logger.info("Fetching data from mongoDB collection in batches of 20.")
+    logger.info("Fetching data from mongoDB collection...")
 
     with MongoDBService(
         model=Fyp_data,

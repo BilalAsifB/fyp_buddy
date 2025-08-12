@@ -64,7 +64,7 @@ class MatcherGraphRunner():
             done=False,
             offset=0,
             limit=20,
-            results=[]
+            results={}
         )
 
         logger.info("[Graph] Invoking graph...")
