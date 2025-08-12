@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from pymongo.mongo_client import MongoClient
 from pymongo import errors
 
-from ....agent.config import settings
+from agent.config import settings
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -140,22 +140,35 @@ class MongoDBService(Generic[T]):
             logger.error(f"Error inserting documents: {e}")
             raise
 
-    def fetch_documents(self, limit: int, query: dict) -> list[T]:
+    def fetch_documents(
+        self,
+        limit: int,
+        offset: int = 0,
+        query: dict = {}
+    ) -> list[T]:
         """Retrieve documents from the MongoDB collection based on a query.
 
         Args:
             limit: Maximum number of documents to retrieve.
-            query: MongoDB query filter to apply.
+            offset: Number of documents to skip for pagination (default: 0).
+            query: MongoDB query filter to apply (default: empty dict).
 
         Returns:
             List of Pydantic model instances matching the query criteria.
 
         Raises:
             Exception: If the query operation fails.
-        """
+            """
         try:
-            documents = list(self.collection.find(query).limit(limit))
-            logger.debug(f"Fetched {len(documents)} documents with query: {query}")
+            documents = list(
+                self.collection.find(query)
+                .skip(offset)  # Skip the specified number of documents
+                .limit(limit)  # Limit the number of results
+            )
+            logger.debug(
+                f"Fetched {len(documents)} documents with query: {query}, "
+                f"offset: {offset}, limit: {limit}"
+            )
             return self.__parse_documents(documents)
         except Exception as e:
             logger.error(f"Error fetching documents: {e}")

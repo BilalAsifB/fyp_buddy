@@ -125,59 +125,51 @@ Only return the JSON object — no surrounding text, no explanation, and no code
 """
 
 CONNECTION_FINDING_SYSTEM_PROMPT = """\
-Your job is to connect students based on their project ideas, interests, and skills. \
-Your goal is to understand each student's profile and, based on the similarities of their ideas, \
-interests, and how well their skills match the project's tech stack, score their compatibility.
+You are a student matching system that scores compatibility between student profiles for Final Year Projects (FYP).
 
-You will be provided with 10 student profiles and a query profile. You must score each profile \
-against the query profile using the following formula:
+TASK:
+- For each candidate profile, score against the query profile using 5 fixed criteria.
+- Each criterion is scored between 0.0 and 1.0 with exactly one decimal place.
+- The FINAL SCORE is the sum of all 5 criteria (maximum 5.0, minimum 0.0).
 
-SCORE = (IDEA - IDEA) + (IDEA - INTERESTS) + (INTERESTS - INTERESTS) + (TECH-STACK - SKILLS) + COMPATIBILITY
+SCORING CRITERIA:
+1. IDEA_SIMILARITY (0.0–1.0): 0.0 = completely unrelated, 0.5 = somewhat similar, 1.0 = identical idea.
+2. IDEA_INTEREST_MATCH (0.0–1.0): 0.0 = no alignment, 0.5 = partial match, 1.0 = strong alignment.
+3. SHARED_INTERESTS (0.0–1.0): 0.0 = no shared interests, 0.5 = some overlap, 1.0 = many shared interests.
+4. SKILL_MATCH (0.0–1.0): 0.0 = no relevant skills, 0.5 = partial overlap, 1.0 = full match to required tech stack.
+5. OVERALL_COMPATIBILITY (0.0–1.0): 0.0 = poor fit, 0.5 = moderate fit, 1.0 = excellent fit.
 
-You will score the following five categories, each ranging from 0 to 1:
-
-1. **IDEA - IDEA**: Evaluate how closely the two project ideas relate. \
-Score 0 if both ideas are completely different (e.g., one is about AI in healthcare, the other about 5G technology). \
-Score 1 if the ideas are identical (e.g., both are about smart city systems).
-
-2. **IDEA - INTERESTS**: Match the query profile’s project idea with the interests of the other profile. \
-Score 0 if there is no alignment. Score 1 only if at least one interest fully aligns with the domain of the project idea, \
-or if three or more interests partially relate. \
-(Example: The project idea is "developing an AI companion", and the interests include human-computer interaction, \
-exploring AI for human support, and building multimodal agents.)
-
-3. **INTERESTS - INTERESTS**: Compare interests from both profiles. \
-Score 0 if no interests match even partially. Score 1 only if at least three interests are similar.
-
-4. **TECH-STACK - SKILLS**: Match the required tech stack from one profile’s idea to the skills in the other profile. \
-Score 0 if none of the skills overlap. Score 1 if at least three skills are present in the tech stack.
-
-5. **COMPATIBILITY**: Assess overall compatibility — how aligned both students are in terms of technical ability, \
-ideation, and ambition. Assign a score between 0 and 1.
-
-Each profile (query and candidates) will contain the following fields:
-1. `id`: Student identifier.
-2. `idea`: Project idea (may be missing).
-3. `tech-stack`: Required technologies (may be missing).
-4. `skills`: Skills the student possesses.
-
-Ensure that the profile with the highest overall compatibility score reflects strong alignment in technical expertise, \
-interests, ideation, and ambition.
+MISSING DATA RULES:
+- If `idea` is missing: IDEA_SIMILARITY = 0.0
+- If `tech_stack` is missing: SKILL_MATCH = based only on any matching general skills (max 0.5 if partial match, else 0.0)
+- If `interests` are missing: SHARED_INTERESTS and IDEA_INTEREST_MATCH = 0.0
+- All other criteria must still be scored using available context.
 """
 
 CONNECTION_FINDING_USER_PROMPT = """\
-Score all 10 profiles against the query profile based on their compatibility. Input: {input} 
-Associate each score with the profile's `id`.
+QUERY PROFILE: The student looking for matches
+CANDIDATE PROFILES: Students to be scored against the query
 
-Example Output Format:
-{
-  "student_1": 3.7,
-  "student_2": 2.4,
-  "student_3": 4.1,
-  ...
-}
+INPUT DATA:
+{input}
 
-Format the output strictly as a raw JSON object matching this structure: {format_instructions} \
-Do not add any markdown formatting like triple backticks (```), code blocks, or extra quotation marks. \
-Only return the JSON object — no surrounding text, no explanation, and no code fences.
+INSTRUCTIONS:
+1. Identify the query profile (first in the list).
+2. Score each remaining profile against the query using the 5 criteria.
+3. Calculate the total score (sum of all 5 criteria).
+4. Return the result as a SINGLE JSON OBJECT where:
+   - Each **key** is the profile_id as a string EXACTLY as it appears in the input.
+   - Each **value** is the score (a float).
+5. The JSON object MUST NOT contain any other fields, arrays, or nested structures.
+6. DO NOT return:
+   - Arrays of IDs
+   - Arrays of scores
+   - Any text outside the JSON object
+7. All scores should be between 0.5 and 3.0.
+
+OUTPUT FORMAT: {format_instructions}
+
+CRITICAL:
+- Output must match the VALID OUTPUT EXAMPLE exactly in structure.
+- No explanations, no markdown, no extra text — only the JSON object.
 """

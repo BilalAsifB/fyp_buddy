@@ -4,10 +4,15 @@ from typing import List
 from .fyp_data import Fyp_data
 
 
-class State(BaseModel):
+class Match_State(BaseModel):
     '''
-    Langraph input state.
+    Langraph input state.s
     '''
     all_data: List[Fyp_data] = Field(..., description="List fyp data")
     query: Fyp_data = Field(..., description="Query input.")
     done: bool = Field(..., description="Indicator of all data procssed.")
+    offset: int = Field(0, description="Offset for pagination.")
+    limit: int = Field(20, description="Limit for pagination.")
+    results: dict = Field(
+        description="Dictionary of results with student id as key and score as value."
+    )
