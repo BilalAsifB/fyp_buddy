@@ -1,4 +1,0 @@
-parameters:
-    fyp_data_collection_name: "std_profiles"
-    clear_collection: True
-    

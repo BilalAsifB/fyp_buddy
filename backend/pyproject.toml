@@ -1,0 +1,116 @@
+[project]
+name = "fyp-backend"
+version = "0.1.0"
+description = "FYP Student Matching System Backend API"
+readme = "README.md"
+authors = [
+    { name = "Bilal Asif Burney", email = "bilalburney14@gmail.com" }
+]
+requires-python = ">=3.12"
+
+dependencies = [
+    # Core agent dependencies
+    "langchain>=0.3.27",
+    "langchain-groq>=0.3.6",
+    "langgraph>=0.3.34",
+    "langgraph-cli[inmem]>=0.1.82",
+    "langsmith>=0.3.45",
+    "loguru>=0.7.3",
+    "numpy>=2.3.2",
+    "pydantic>=2.11.1",
+    "pydantic-settings>=2.10.1",
+    "pymongo>=4.13.2",
+    "pyyaml>=6.0.2",
+    "zenml==0.84.0",
+
+    # FastAPI and web dependencies
+    "fastapi>=0.104.1",
+    "uvicorn[standard]>=0.24.0",
+    "python-multipart>=0.0.6",
+    "email-validator>=2.1.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "redis>=5.0.1",
+    "prometheus-client>=0.19.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "httpx>=0.25.2",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+]
+
+[project.scripts]
+fyp-backend = "main:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app", "src"]
+include = [
+    "main.py",
+    "app/**/*.py",
+    "src/**/*.py",
+    "*.py",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "app/**",
+    "src/**", 
+    "main.py",
+    "requirements.txt",
+    "README.md",
+    "pyproject.toml",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = "langgraph.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "langsmith.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "groq.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pymongo.*"
+ignore_missing_imports = true
