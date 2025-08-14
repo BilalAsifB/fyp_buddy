@@ -52,7 +52,7 @@ def setup_logging():
     # Configure langsmith logging
     if settings.LANGSMITH_TRACING.lower() == "true":
         import os
-        os.environ["LANGCHAIN_TRACING_V2"] = "true"
+        os.environ["LANGCHAIN_TRACING_V2"] = settings.LANGSMITH_TRACING
         os.environ["LANGCHAIN_API_KEY"] = settings.LANGSMITH_API_KEY
         os.environ["LANGCHAIN_ENDPOINT"] = settings.LANGSMITH_ENDPOINT
         os.environ["LANGCHAIN_PROJECT"] = settings.LANGSMITH_PROJECT
