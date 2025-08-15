@@ -14,6 +14,7 @@ import { Container, Section, Grid, AnimatedPage } from '@/components/layout'
 import { Button, Card, Badge, Alert, Spinner } from '@/components/ui'
 import { useMatchingStats, useRateLimit } from '@/hooks'
 import { APP_CONFIG } from '@/constants'
+import { cn } from '@/utils'
 
 const HomePage = () => {
   const navigate = useNavigate()

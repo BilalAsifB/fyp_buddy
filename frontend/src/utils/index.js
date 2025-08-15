@@ -309,3 +309,65 @@ export function getAvatarColor(seed) {
 }
 
 /**
+ * Convert snake_case to camelCase
+ * @param {string} str
+ * @returns {string}
+ */
+export function snakeToCamel(str) {
+  return str.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase())
+}
+
+/**
+ * Convert camelCase to snake_case
+ * @param {string} str
+ * @returns {string}
+ */
+export function camelToSnake(str) {
+  return str.replace(/([A-Z])/g, '_$1').toLowerCase()
+}
+
+/**
+ * Convert object keys from snake_case to camelCase
+ * @param {object} obj
+ * @returns {object}
+ */
+export function keysToCamel(obj) {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return obj
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(keysToCamel)
+  }
+  
+  const result = {}
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      result[snakeToCamel(key)] = keysToCamel(obj[key])
+    }
+  }
+  return result
+}
+
+/**
+ * Convert object keys from camelCase to snake_case
+ * @param {object} obj
+ * @returns {object}
+ */
+export function keysToSnake(obj) {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return obj
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(keysToSnake)
+  }
+  
+  const result = {}
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      result[camelToSnake(key)] = keysToSnake(obj[key])
+    }
+  }
+  return result
+}

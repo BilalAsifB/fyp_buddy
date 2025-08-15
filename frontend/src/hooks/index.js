@@ -170,36 +170,41 @@ export function useFormValidation(validationSchema, initialData = {}) {
   const [touched, setTouched] = useState({})
   const [isValid, setIsValid] = useState(false)
 
-  // Debounced validation function
-  const validateField = useCallback(
-    debounce((fieldName, value) => {
-      try {
-        // Create a test object with current data
-        const testData = { ...data, [fieldName]: value }
-        validationSchema.parse(testData)
-        
-        // Clear error if validation passes
-        setErrors(prev => {
-          const newErrors = { ...prev }
-          delete newErrors[fieldName]
-          return newErrors
-        })
-      } catch (error) {
-        // Set error if validation fails
-        const fieldError = error.errors.find(err => 
-          err.path.join('.') === fieldName
-        )
-        
-        if (fieldError) {
-          setErrors(prev => ({
-            ...prev,
-            [fieldName]: fieldError.message,
-          }))
-        }
+  // Create a stable debounced validation function
+  const validateField = useCallback((fieldName, value) => {
+    try {
+      // Create a test object with current data
+      const testData = { ...data, [fieldName]: value }
+      validationSchema.parse(testData)
+      
+      // Clear error if validation passes
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+    } catch (error) {
+      // Set error if validation fails
+      const fieldError = error.errors.find(err => 
+        err.path.join('.') === fieldName
+      )
+      
+      if (fieldError) {
+        setErrors(prev => ({
+          ...prev,
+          [fieldName]: fieldError.message,
+        }))
       }
-    }, 300),
-    [data, validationSchema]
-  )
+    }
+  }, [data, validationSchema])
+
+  // Create debounced version using useRef to maintain stability
+  const debouncedValidateRef = useRef(debounce(validateField, 300))
+  
+  // Update the debounced function when dependencies change
+  useEffect(() => {
+    debouncedValidateRef.current = debounce(validateField, 300)
+  }, [validateField])
 
   // Update field value
   const setValue = useCallback((fieldName, value) => {
@@ -214,9 +219,9 @@ export function useFormValidation(validationSchema, initialData = {}) {
       [fieldName]: true,
     }))
     
-    // Validate field
-    validateField(fieldName, value)
-  }, [validateField])
+    // Validate field with debounce
+    debouncedValidateRef.current(fieldName, value)
+  }, [])
 
   // Validate entire form
   const validateForm = useCallback(() => {
@@ -377,4 +382,4 @@ export function useAsync() {
   }, [])
 
   return { ...state, execute, reset }
-}
+  
