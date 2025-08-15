@@ -11,28 +11,34 @@ export function useApiHealth() {
     loading: true,
     error: null,
     lastChecked: null,
+    data: null,
   })
 
   const checkHealth = useCallback(async () => {
     setHealth(prev => ({ ...prev, loading: true, error: null }))
-    
-    const result = await apiService.checkHealth()
-    
-    setHealth({
-      status: result.success ? 'healthy' : 'unhealthy',
-      loading: false,
-      error: result.success ? null : result.error,
-      lastChecked: new Date(),
-      data: result.data,
-    })
+    try {
+      const result = await apiService.checkHealth()
+      setHealth({
+        status: result.success ? 'healthy' : 'unhealthy',
+        loading: false,
+        error: result.success ? null : result.error,
+        lastChecked: new Date(),
+        data: result.data ?? null,
+      })
+    } catch (err) {
+      setHealth({
+        status: 'unhealthy',
+        loading: false,
+        error: err.message ?? 'Unknown error',
+        lastChecked: new Date(),
+        data: null,
+      })
+    }
   }, [])
 
   useEffect(() => {
     checkHealth()
-    
-    // Check health every 30 seconds
     const interval = setInterval(checkHealth, 30000)
-    
     return () => clearInterval(interval)
   }, [checkHealth])
 
@@ -51,14 +57,16 @@ export function useMatchingStats() {
 
   const fetchStats = useCallback(async () => {
     setStats(prev => ({ ...prev, loading: true, error: null }))
-    
-    const result = await apiService.getMatchingStats()
-    
-    setStats({
-      data: result.success ? result.data : null,
-      loading: false,
-      error: result.success ? null : result.error,
-    })
+    try {
+      const result = await apiService.getMatchingStats()
+      setStats({
+        data: result.success ? result.data : null,
+        loading: false,
+        error: result.success ? null : result.error,
+      })
+    } catch (err) {
+      setStats({ data: null, loading: false, error: err.message })
+    }
   }, [])
 
   useEffect(() => {
@@ -79,13 +87,16 @@ export function useRateLimit() {
   })
 
   const fetchRateLimit = useCallback(async () => {
-    const result = await apiService.getRateLimitStatus()
-    
-    setRateLimit({
-      data: result.success ? result.data : null,
-      loading: false,
-      error: result.success ? null : result.error,
-    })
+    try {
+      const result = await apiService.getRateLimitStatus()
+      setRateLimit({
+        data: result.success ? result.data : null,
+        loading: false,
+        error: result.success ? null : result.error,
+      })
+    } catch (err) {
+      setRateLimit({ data: null, loading: false, error: err.message })
+    }
   }, [])
 
   useEffect(() => {
@@ -107,14 +118,7 @@ export function useMatching() {
   })
 
   const findMatches = useCallback(async (profileData) => {
-    setMatching({
-      data: null,
-      loading: true,
-      error: null,
-      progress: 0,
-    })
-
-    // Simulate progress updates
+    setMatching({ data: null, loading: true, error: null, progress: 0 })
     const progressInterval = setInterval(() => {
       setMatching(prev => ({
         ...prev,
@@ -124,38 +128,28 @@ export function useMatching() {
 
     try {
       const result = await apiService.findMatches(profileData)
-      
       clearInterval(progressInterval)
-      
       setMatching({
         data: result.success ? result.data : null,
         loading: false,
         error: result.success ? null : result.error,
         progress: 100,
       })
-
       return result
     } catch (error) {
       clearInterval(progressInterval)
-      
       setMatching({
         data: null,
         loading: false,
         error: error.message,
         progress: 0,
       })
-      
       return { success: false, error: error.message }
     }
   }, [])
 
   const reset = useCallback(() => {
-    setMatching({
-      data: null,
-      loading: false,
-      error: null,
-      progress: 0,
-    })
+    setMatching({ data: null, loading: false, error: null, progress: 0 })
   }, [])
 
   return { ...matching, findMatches, reset }
@@ -170,60 +164,37 @@ export function useFormValidation(validationSchema, initialData = {}) {
   const [touched, setTouched] = useState({})
   const [isValid, setIsValid] = useState(false)
 
-  // Create a stable debounced validation function
   const validateField = useCallback((fieldName, value) => {
     try {
-      // Create a test object with current data
       const testData = { ...data, [fieldName]: value }
       validationSchema.parse(testData)
-      
-      // Clear error if validation passes
       setErrors(prev => {
         const newErrors = { ...prev }
         delete newErrors[fieldName]
         return newErrors
       })
     } catch (error) {
-      // Set error if validation fails
-      const fieldError = error.errors.find(err => 
+      const fieldError = error.errors?.find(err =>
         err.path.join('.') === fieldName
       )
-      
       if (fieldError) {
-        setErrors(prev => ({
-          ...prev,
-          [fieldName]: fieldError.message,
-        }))
+        setErrors(prev => ({ ...prev, [fieldName]: fieldError.message }))
       }
     }
   }, [data, validationSchema])
 
-  // Create debounced version using useRef to maintain stability
   const debouncedValidateRef = useRef(debounce(validateField, 300))
-  
-  // Update the debounced function when dependencies change
+
   useEffect(() => {
     debouncedValidateRef.current = debounce(validateField, 300)
   }, [validateField])
 
-  // Update field value
   const setValue = useCallback((fieldName, value) => {
-    setData(prev => ({
-      ...prev,
-      [fieldName]: value,
-    }))
-    
-    // Mark field as touched
-    setTouched(prev => ({
-      ...prev,
-      [fieldName]: true,
-    }))
-    
-    // Validate field with debounce
+    setData(prev => ({ ...prev, [fieldName]: value }))
+    setTouched(prev => ({ ...prev, [fieldName]: true }))
     debouncedValidateRef.current(fieldName, value)
   }, [])
 
-  // Validate entire form
   const validateForm = useCallback(() => {
     try {
       validationSchema.parse(data)
@@ -231,7 +202,7 @@ export function useFormValidation(validationSchema, initialData = {}) {
       return true
     } catch (error) {
       const newErrors = {}
-      error.errors.forEach(err => {
+      error.errors?.forEach(err => {
         const path = err.path.join('.')
         newErrors[path] = err.message
       })
@@ -240,7 +211,6 @@ export function useFormValidation(validationSchema, initialData = {}) {
     }
   }, [data, validationSchema])
 
-  // Check if form is valid
   useEffect(() => {
     const hasNoErrors = Object.keys(errors).length === 0
     const hasRequiredFields = Object.keys(data).length > 0
@@ -267,29 +237,25 @@ export function useLocalStorage(key, initialValue) {
     try {
       const item = window.localStorage.getItem(key)
       return item ? JSON.parse(item) : initialValue
-    } catch (error) {
-      console.error(`Error reading from localStorage key "${key}":`, error)
+    } catch {
       return initialValue
     }
   })
 
   const setValue = useCallback((value) => {
     try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value
       setStoredValue(valueToStore)
       window.localStorage.setItem(key, JSON.stringify(valueToStore))
-    } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error)
-    }
+    } catch {}
   }, [key, storedValue])
 
   const removeValue = useCallback(() => {
     try {
       window.localStorage.removeItem(key)
       setStoredValue(initialValue)
-    } catch (error) {
-      console.error(`Error removing localStorage key "${key}":`, error)
-    }
+    } catch {}
   }, [key, initialValue])
 
   return [storedValue, setValue, removeValue]
@@ -302,7 +268,7 @@ export function usePrevious(value) {
   const ref = useRef()
   useEffect(() => {
     ref.current = value
-  })
+  }, [value])
   return ref.current
 }
 
@@ -322,10 +288,8 @@ export function useWindowSize() {
         height: window.innerHeight,
       })
     }
-
     window.addEventListener('resize', handleResize)
     handleResize()
-
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
@@ -338,15 +302,11 @@ export function useWindowSize() {
 export function useClickOutside(ref, handler) {
   useEffect(() => {
     const listener = (event) => {
-      if (!ref.current || ref.current.contains(event.target)) {
-        return
-      }
+      if (!ref.current || ref.current.contains(event.target)) return
       handler(event)
     }
-
     document.addEventListener('mousedown', listener)
     document.addEventListener('touchstart', listener)
-
     return () => {
       document.removeEventListener('mousedown', listener)
       document.removeEventListener('touchstart', listener)
@@ -366,13 +326,12 @@ export function useAsync() {
 
   const execute = useCallback(async (asyncFunction) => {
     setState({ loading: true, error: null, data: null })
-    
     try {
       const result = await asyncFunction()
       setState({ loading: false, error: null, data: result })
       return result
     } catch (error) {
-      setState({ loading: false, error, data: null })
+      setState({ loading: false, error: error.message, data: null })
       throw error
     }
   }, [])
@@ -382,4 +341,4 @@ export function useAsync() {
   }, [])
 
   return { ...state, execute, reset }
-  
+}
