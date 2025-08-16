@@ -1,9 +1,12 @@
 import { z } from 'zod';
 import { GenderEnum, DEPARTMENTS, YEARS } from '../services/types';
 
+// Convert DEPARTMENTS readonly tuple into mutable string array for z.enum
+const DEPARTMENT_VALUES = [...DEPARTMENTS] as [string, ...string[]];
+
 // Validation schemas matching backend requirements
 export const metadataSchema = z.object({
-  department: z.enum(DEPARTMENTS as [string, ...string[]], {
+  department: z.enum(DEPARTMENT_VALUES, {
     required_error: "Department is required",
     invalid_type_error: "Please select a valid department"
   }),
@@ -41,85 +44,3 @@ export const profileSchema = z.object({
 }).merge(metadataSchema);
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
-
-// Custom validation functions
-export const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-export const validateGPA = (gpa: number): boolean => {
-  return gpa >= 2.0 && gpa <= 4.0;
-};
-
-export const validateYear = (year: number): boolean => {
-  return year >= 19 && year <= 25;
-};
-
-export const validateArrayLength = (array: string[], min: number, max: number): boolean => {
-  return array.length >= min && array.length <= max;
-};
-
-export const sanitizeInput = (input: string): string => {
-  return input.trim().replace(/\s+/g, ' ');
-};
-
-export const validateProjectIdea = (idea: string): { isValid: boolean; message?: string } => {
-  const trimmed = idea.trim();
-  
-  if (trimmed.length < 50) {
-    return { isValid: false, message: "Project idea must be at least 50 characters" };
-  }
-  
-  if (trimmed.length > 1000) {
-    return { isValid: false, message: "Project idea must be at most 1000 characters" };
-  }
-  
-  // Check for meaningful content (not just repeated characters)
-  const uniqueChars = new Set(trimmed.toLowerCase().replace(/\s/g, '')).size;
-  if (uniqueChars < 10) {
-    return { isValid: false, message: "Project idea should contain more meaningful content" };
-  }
-  
-  return { isValid: true };
-};
-
-export const validateTechStack = (techStack: string[]): { isValid: boolean; message?: string } => {
-  const filtered = techStack.filter(tech => tech.trim().length > 0);
-  
-  if (filtered.length === 0) {
-    return { isValid: false, message: "At least one technology is required" };
-  }
-  
-  if (filtered.length > 25) {
-    return { isValid: false, message: "Maximum 25 technologies allowed" };
-  }
-  
-  // Check for duplicates
-  const unique = new Set(filtered.map(tech => tech.toLowerCase().trim()));
-  if (unique.size !== filtered.length) {
-    return { isValid: false, message: "Duplicate technologies are not allowed" };
-  }
-  
-  return { isValid: true };
-};
-
-export const validateSkills = (skills: string[]): { isValid: boolean; message?: string } => {
-  const filtered = skills.filter(skill => skill.trim().length > 0);
-  
-  if (filtered.length === 0) {
-    return { isValid: false, message: "At least one skill is required" };
-  }
-  
-  if (filtered.length > 20) {
-    return { isValid: false, message: "Maximum 20 skills allowed" };
-  }
-  
-  // Check for duplicates
-  const unique = new Set(filtered.map(skill => skill.toLowerCase().trim()));
-  if (unique.size !== filtered.length) {
-    return { isValid: false, message: "Duplicate skills are not allowed" };
-  }
-  
-  return { isValid: true };
-};
