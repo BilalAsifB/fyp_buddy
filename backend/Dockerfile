@@ -1,17 +1,20 @@
-# Backend Dockerfile
+# Backend Dockerfile with UV support
 FROM python:3.12-slim
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH="/app" \
-    PORT=8000
+    PORT=8000 \
+    UV_CACHE_DIR=/tmp/uv-cache
 
-# Install system dependencies
+# Install system dependencies and uv
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
-    && rm -rf /var/lib/apt/lists/*
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir uv
 
 # Create app directory
 WORKDIR /app
@@ -19,12 +22,17 @@ WORKDIR /app
 # Create logs directory
 RUN mkdir -p /app/logs
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Copy dependency files first for caching
+COPY pyproject.toml .
+COPY uv.lock .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies using uv
+# Use uv pip instead of uv sync for Docker compatibility
+RUN uv venv .venv && \
+    uv pip install --python .venv/bin/python -r pyproject.toml
+
+# Activate virtual environment by updating PATH
+ENV PATH="/app/.venv/bin:$PATH"
 
 # Copy application code
 COPY . .

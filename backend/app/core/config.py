@@ -1,7 +1,7 @@
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 import secrets
 from urllib.parse import urlparse
 import os
@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     # --- Pydantic Settings ---
     model_config = SettingsConfigDict(
-        env_file=str(Path(__file__).resolve().parents[2] / ".env"),
+        env_file=str(Path(__file__).resolve().parents[2] / ".env") if (Path(__file__).resolve().parents[2] / ".env").exists() else None,
         env_file_encoding="utf-8",
         case_sensitive=False,  # Allow case-insensitive env var names
         extra="ignore"         # Ignore unknown variables instead of failing
@@ -38,8 +38,7 @@ class Settings(BaseSettings):
     # --- CORS Configuration ---
     ALLOWED_ORIGINS: List[str] = Field(
         default=["http://localhost:3000", "http://localhost:3001"],
-        description="Allowed CORS origins",
-        alias="allowed_origins"
+        description="Allowed CORS origins (list or comma-separated string)"
     )
 
     # --- Rate Limiting Configuration ---
@@ -55,7 +54,11 @@ class Settings(BaseSettings):
     )
 
     # --- Langsmith/LangChain Configuration ---
-    LANGSMITH_API_KEY: str = Field(description="API key for LangSmith services", alias="langsmith_api_key")
+    LANGSMITH_API_KEY: str = Field(
+        default="dummy-key", 
+        description="API key for LangSmith services", 
+        alias="langsmith_api_key"
+    )
     LANGSMITH_TRACING: str = Field(
         default="true",
         description="Enable tracing",
@@ -73,7 +76,11 @@ class Settings(BaseSettings):
     )
 
     # --- Groq Configuration ---
-    GROQ_API_KEY: str = Field(description="API key for Groq services", alias="groq_api_key")
+    GROQ_API_KEY: str = Field(
+        default="dummy-key",
+        description="API key for Groq services", 
+        alias="groq_api_key"
+    )
 
     # --- MongoDB Atlas Configuration ---
     MONGODB_DATABASE_NAME: str = Field(
@@ -81,7 +88,11 @@ class Settings(BaseSettings):
         description="Name of the MongoDB database",
         alias="mongodb_database_name"
     )
-    MONGODB_URI: str = Field(description="Connection URI for MongoDB Atlas", alias="mongodb_uri")
+    MONGODB_URI: str = Field(
+        default="mongodb://localhost:27017/fyp_buddy",
+        description="Connection URI for MongoDB Atlas", 
+        alias="mongodb_uri"
+    )
 
     # --- Logging Configuration ---
     # Note: LOG_FORMAT assumes a logging library like `loguru` or `rich` that supports colored output
@@ -113,27 +124,42 @@ class Settings(BaseSettings):
 
     @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod
-    def split_origins(cls, v):
-        """
-        Allow ALLOWED_ORIGINS in .env to be a comma-separated string.
-        Example: "http://localhost:3000,http://localhost:3001"
-        """
+    def parse_origins_from_env(cls, v):
+        """Parse ALLOWED_ORIGINS from environment variable."""
         if isinstance(v, str):
+            if v == "*":
+                return ["*"]
+            # Split comma-separated string
             return [origin.strip() for origin in v.split(",") if origin.strip()]
-        return v
+        elif isinstance(v, list):
+            return v
+        else:
+            return ["http://localhost:3000"]
 
-    @field_validator("ALLOWED_ORIGINS")
+    @field_validator("ALLOWED_ORIGINS", mode="after")
     @classmethod
-    def validate_origins(cls, v: List[str]) -> List[str]:
-        """Validate that ALLOWED_ORIGINS are valid URLs."""
+    def validate_allowed_origins(cls, v: List[str]) -> List[str]:
+        """Validate ALLOWED_ORIGINS list."""
+        validated_origins = []
         for origin in v:
-            try:
-                result = urlparse(origin)
-                if not all([result.scheme, result.netloc]):
-                    raise ValueError(f"Invalid URL for origin: {origin}")
-            except ValueError:
-                raise ValueError(f"Invalid URL for origin: {origin}")
-        return v
+            if origin == "*":
+                validated_origins.append(origin)
+            else:
+                try:
+                    result = urlparse(origin)
+                    if result.scheme and result.netloc:
+                        validated_origins.append(origin)
+                    else:
+                        print(f"⚠️  Skipping invalid origin: {origin}")
+                except Exception as e:
+                    print(f"⚠️  Error parsing origin {origin}: {e}")
+        
+        return validated_origins if validated_origins else ["http://localhost:3000"]
+
+    @property
+    def parsed_allowed_origins(self) -> List[str]:
+        """Get ALLOWED_ORIGINS as a list for use in CORS middleware."""
+        return self.ALLOWED_ORIGINS
 
     # --- Helper properties ---
     @property
@@ -146,32 +172,18 @@ class Settings(BaseSettings):
         """Check if running in development"""
         return self.ENVIRONMENT == "development"
 
-# Validate .env file existence
+
+# Check if .env file exists (optional for Docker)
 env_file = Path(__file__).resolve().parents[2] / ".env"
 if not env_file.exists():
-    print(f"❌ .env file not found at {env_file}")
-    raise FileNotFoundError(f".env file not found at {env_file}")
-
-# Debug environment variables
-print("Environment variables:", {
-    k: v for k, v in os.environ.items()
-    if k.lower() in [
-        "project_name", "version", "environment", "debug", "host", "port", "secret_key",
-        "allowed_origins", "rate_limit_calls_per_day", "rate_limit_redis_url",
-        "langsmith_api_key", "langsmith_tracing", "langsmith_endpoint", "langsmith_project",
-        "groq_api_key", "mongodb_database_name", "mongodb_uri", "log_level", "log_format"
-    ]
-})
+    print(f"ℹ️  .env file not found at {env_file} - using environment variables from container")
 
 # Initialize settings
 try:
     settings = Settings()
-except pydantic.ValidationError as e:
-    print(f"❌ Configuration validation error: {e}")
-    raise SystemExit(1)
-except FileNotFoundError as e:
-    print(f"❌ .env file error: {e}")
-    raise SystemExit(1)
+    print(f"✅ Configuration loaded successfully")
+    print(f"📊 Environment: {settings.ENVIRONMENT}")
+    print(f"🔧 Debug mode: {settings.DEBUG}")
 except Exception as e:
-    print(f"❌ Unexpected error loading configuration: {e}")
+    print(f"❌ Configuration validation error: {e}")
     raise SystemExit(1)

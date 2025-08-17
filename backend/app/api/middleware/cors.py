@@ -12,12 +12,13 @@ from loguru import logger
 def setup_cors(app: FastAPI) -> None:
     """Setup CORS middleware"""
     
-    # Allow all origins in development, restrict in production
+    # Get allowed origins from settings
     if settings.is_development:
         allowed_origins = ["*"]
         logger.warning("🔓 CORS configured for development - allowing all origins")
     else:
-        allowed_origins = settings.ALLOWED_ORIGINS
+        # Parse the ALLOWED_ORIGINS string into a list
+        allowed_origins = settings.parsed_allowed_origins
         logger.info(f"🔒 CORS configured for production - allowed origins: {allowed_origins}")
     
     app.add_middleware(

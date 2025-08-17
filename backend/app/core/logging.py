@@ -32,7 +32,7 @@ def setup_logging():
             level="INFO",
             rotation="1 day",
             retention="30 days",
-            compression="gzip",
+            compression="gz",  # Changed from "gzip" to "gz"
             backtrace=True,
             diagnose=True
         )
@@ -44,7 +44,7 @@ def setup_logging():
             level="ERROR",
             rotation="1 day",
             retention="30 days",
-            compression="gzip",
+            compression="gz",  # Changed from "gzip" to "gz"
             backtrace=True,
             diagnose=True
         )
