@@ -4,7 +4,7 @@ File: backend/main.py
 """
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import sys
@@ -23,71 +23,75 @@ from app.api.middleware.rate_limiting import RateLimitMiddleware
 
 from loguru import logger
 
+# Global Mongo client
+db_client = None
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan events"""
+    global db_client
+
     # Startup
     logger.info("🚀 Starting FYP Agent API...")
     logger.info(f"Environment: {settings.ENVIRONMENT}")
     logger.info(f"Debug mode: {settings.DEBUG}")
-    
-    # Test database connection
+
     try:
-        from src.agent.infrastructure.mongo.service import MongoDBService
-        from src.agent.domain.fyp_data import Fyp_data
-        
-        with MongoDBService(
-            model=Fyp_data,
-            collection_name="std_profiles"
-        ) as service:
-            count = service.get_collection_count()
-            logger.info(f"✅ MongoDB connected. Documents in collection: {count}")
-            
+        # Initialize MongoDB client once
+        from motor.motor_asyncio import AsyncIOMotorClient
+
+        db_client = AsyncIOMotorClient(settings.MONGO_URI)
+        await db_client.admin.command("ping")
+        logger.info("✅ MongoDB connected and ping successful.")
+
     except Exception as e:
         logger.error(f"❌ MongoDB connection failed: {e}")
         raise
-    
+
     yield
-    
+
     # Shutdown
+    if db_client:
+        db_client.close()
+        logger.info("🔌 MongoDB connection closed.")
     logger.info("🔌 Shutting down FYP Agent API...")
 
 
 def create_application() -> FastAPI:
     """Create and configure FastAPI application"""
-    
+
     app = FastAPI(
         title=settings.PROJECT_NAME,
         description="FYP Student Matching System API",
         version=settings.VERSION,
         docs_url="/docs" if settings.DEBUG else None,
         redoc_url="/redoc" if settings.DEBUG else None,
-        lifespan=lifespan
+        lifespan=lifespan,
     )
-    
+
     # Setup CORS
     setup_cors(app)
-    
+
     # Setup error handlers
     setup_error_handlers(app)
-    
+
     # Add rate limiting middleware
     app.add_middleware(RateLimitMiddleware)
-    
+
     # Include routers
     app.include_router(health.router, prefix="/health", tags=["health"])
     app.include_router(matching.router, prefix="/api/v1", tags=["matching"])
-    
+
     @app.get("/")
     async def root():
         """Root endpoint"""
         return {
             "message": "FYP Agent API",
             "version": settings.VERSION,
-            "docs": "/docs" if settings.DEBUG else "Documentation disabled in production"
+            "docs": "/docs" if settings.DEBUG else "Documentation disabled in production",
         }
-    
+
     return app
 
 
@@ -103,5 +107,5 @@ if __name__ == "__main__":
         host=settings.HOST,
         port=settings.PORT,
         reload=settings.DEBUG,
-        log_level="info"
+        log_level="info",
     )
