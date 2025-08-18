@@ -8,7 +8,7 @@ from src.agent.application.agents.graphs.nodes.generate_interests_node import (
     generate_interests_node
 )
 
-from app.core.config import settings
+from src.agent.config import settings
 
 from loguru import logger
 

@@ -5,8 +5,7 @@ from langchain.callbacks.tracers import LangChainTracer
 from src.agent.domain.match_state import Match_State
 from src.agent.domain.fyp_data import Fyp_data
 
-from app.core.config import settings
-
+from src.agent.config import settings
 from src.agent.application.agents.graphs.nodes.fetch_data_node import fetch_data_node
 from src.agent.application.agents.graphs.nodes.find_connection_node import find_connection_node
 from src.agent.application.agents.graphs.nodes.should_fetch_more import should_fetch_more

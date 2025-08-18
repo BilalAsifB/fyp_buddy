@@ -7,8 +7,7 @@ from src.agent.application.agents.prompts.pull_interest_prompt import (
 )
 
 from src.agent.domain.gen_state import Gen_State
-
-from app.core.config import settings
+from src.agent.config import settings
 
 from loguru import logger
 

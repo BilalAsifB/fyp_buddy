@@ -8,7 +8,7 @@ from src.agent.application.agents.graphs.nodes.generate_projects_node import (
     generate_projects_node
 )
 
-from app.core.config import settings
+from src.agent.config import settings
 
 from loguru import logger
 

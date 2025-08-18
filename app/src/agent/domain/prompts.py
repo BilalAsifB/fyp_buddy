@@ -5,7 +5,7 @@ from langsmith.utils import LangSmithUserError
 from loguru import logger
 from typing import Optional, Sequence
 
-from app.core.config import settings
+from src.agent.config import settings
 
 
 class Prompt:

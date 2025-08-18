@@ -7,8 +7,7 @@ from src.agent.application.agents.prompts.pull_connection_finding_prompt import 
 )
 
 from src.agent.domain.connection_llm_output import Connection_llm_output
-
-from app.core.config import settings
+from src.agent.config import settings
 
 from loguru import logger
 

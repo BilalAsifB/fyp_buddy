@@ -5,8 +5,7 @@ from langchain.prompts import ChatPromptTemplate
 from langsmith import Client
 from langsmith.utils import LangSmithUserError
 
-from app.core.config import settings
-
+from src.agent.config import settings
 
 def pull_connection_finding_prompt() -> ChatPromptTemplate:
     '''

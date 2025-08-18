@@ -6,8 +6,7 @@ from src.agent.application.agents.prompts.pull_proj_prompts import (
     pull_proj_gen_prompt
 )
 from src.agent.domain.gen_state import Gen_State
-
-from app.core.config import settings
+from src.agent.config import settings
 
 from loguru import logger
 
