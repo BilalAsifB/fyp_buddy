@@ -1,7 +1,24 @@
 [project]
-name = "app"
+name = "fyp-backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "FYP Student Matching System Backend API"
 readme = "README.md"
+authors = [
+    { name = "Bilal Asif Burney", email = "bilalburney14@gmail.com" }
+]
 requires-python = ">=3.12"
-dependencies = []
+
+dependencies = [
+    "langchain>=0.3.27",
+    "langchain-groq>=0.3.6",
+    "langgraph>=0.3.34",
+    "langgraph-cli[inmem]>=0.1.82",
+    "langsmith>=0.3.45",
+    "loguru>=0.7.3",
+    "numpy>=2.3.2",
+    "pydantic>=2.11.1",
+    "pydantic-settings>=2.10.1",
+    "pymongo>=4.13.2",
+    "pyyaml>=6.0.2",
+    "zenml==0.84.0",
+]
