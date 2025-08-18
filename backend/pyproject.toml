@@ -22,7 +22,6 @@ dependencies = [
     "pymongo>=4.13.2",
     "pyyaml>=6.0.2",
     "zenml==0.84.0",
-
     # FastAPI and web dependencies
     "fastapi>=0.104.1",
     "uvicorn[standard]>=0.24.0",
@@ -32,6 +31,7 @@ dependencies = [
     "passlib[bcrypt]>=1.7.4",
     "redis>=5.0.1",
     "prometheus-client>=0.19.0",
+    "motor>=3.7.1",
 ]
 
 [project.optional-dependencies]

@@ -69,6 +69,4 @@ Dockerfile
 docker-compose.yml
 
 # Other
-README.md
-*.md
 .env.example

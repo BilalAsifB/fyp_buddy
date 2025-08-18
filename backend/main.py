@@ -41,7 +41,7 @@ async def lifespan(app: FastAPI):
         # Initialize MongoDB client once
         from motor.motor_asyncio import AsyncIOMotorClient
 
-        db_client = AsyncIOMotorClient(settings.MONGO_URI)
+        db_client = AsyncIOMotorClient(settings.MONGODB_URI)
         await db_client.admin.command("ping")
         logger.info("✅ MongoDB connected and ping successful.")
 

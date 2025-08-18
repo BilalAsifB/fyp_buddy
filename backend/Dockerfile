@@ -25,6 +25,8 @@ RUN mkdir -p /app/logs
 # Copy dependency files first for caching
 COPY pyproject.toml .
 COPY uv.lock .
+# ✅ Ensure README.md exists for hatchling metadata
+COPY README.md .
 
 # Install Python dependencies using uv
 # Use uv pip instead of uv sync for Docker compatibility
