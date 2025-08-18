@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from pymongo.mongo_client import MongoClient
 from pymongo import errors
 
-from app.core.config import settings
+from src.agent.config import settings
 
 T = TypeVar("T", bound=BaseModel)
 
