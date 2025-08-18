@@ -5,11 +5,10 @@ Configuration Test - Tests if all required environment variables and settings ar
 
 import sys
 from pathlib import Path
+from loguru import logger
 
 # Add the src directory to Python path (from test_scripts directory)
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-
-from loguru import logger
 
 # Configure logger
 logger.remove()
@@ -22,7 +21,7 @@ def test_configuration():
     logger.info("🔧 Testing Configuration...")
     
     try:
-        from src.agent.config import settings
+        from agent.config import settings
         
         required_settings = [
             "GROQ_API_KEY",

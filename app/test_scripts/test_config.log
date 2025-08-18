@@ -1,0 +1,24 @@
+2025-08-19 03:47:28.268 | INFO     | __main__:test_configuration:22 - 🔧 Testing Configuration...
+2025-08-19 03:47:28.269 | ERROR    | __main__:test_configuration:61 - ❌ Failed to import configuration: No module named 'src'
+2025-08-19 03:48:34.522 | INFO     | __main__:test_configuration:21 - 🔧 Testing Configuration...
+2025-08-19 03:48:34.523 | ERROR    | __main__:test_configuration:60 - ❌ Failed to import configuration: No module named 'app'
+2025-08-19 03:48:55.316 | INFO     | __main__:test_configuration:21 - 🔧 Testing Configuration...
+2025-08-19 03:48:55.316 | ERROR    | __main__:test_configuration:60 - ❌ Failed to import configuration: No module named 'src'
+2025-08-19 03:49:05.940 | INFO     | __main__:test_configuration:21 - 🔧 Testing Configuration...
+2025-08-19 03:49:05.941 | ERROR    | __main__:test_configuration:60 - ❌ Failed to import configuration: No module named 'src'
+2025-08-19 03:51:23.517 | INFO     | __main__:test_configuration:21 - 🔧 Testing Configuration...
+2025-08-19 03:51:23.663 | INFO     | agent.config:<module>:59 - Configuration loaded successfully
+2025-08-19 03:51:23.663 | INFO     | __main__:test_configuration:43 - ✓ GROQ_API_KEY: [CONFIGURED]
+2025-08-19 03:51:23.663 | INFO     | __main__:test_configuration:43 - ✓ LANGSMITH_API_KEY: [CONFIGURED]
+2025-08-19 03:51:23.663 | INFO     | __main__:test_configuration:45 - ✓ MONGODB_URI: mongodb+srv://bilalburney14:3780353783@cluster0.v6ydmco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+2025-08-19 03:51:23.664 | INFO     | __main__:test_configuration:45 - ✓ MONGODB_DATABASE_NAME: fyp_data
+2025-08-19 03:51:23.664 | SUCCESS  | __main__:test_configuration:54 - ✅ All configuration settings are present
+2025-08-19 03:51:23.664 | INFO     | __main__:test_configuration:55 - Found 4 required settings
+2025-08-19 03:57:16.330 | INFO     | __main__:test_configuration:21 - 🔧 Testing Configuration...
+2025-08-19 03:57:16.467 | INFO     | agent.config:<module>:59 - Configuration loaded successfully
+2025-08-19 03:57:16.467 | INFO     | __main__:test_configuration:43 - ✓ GROQ_API_KEY: [CONFIGURED]
+2025-08-19 03:57:16.467 | INFO     | __main__:test_configuration:43 - ✓ LANGSMITH_API_KEY: [CONFIGURED]
+2025-08-19 03:57:16.467 | INFO     | __main__:test_configuration:45 - ✓ MONGODB_URI: mongodb+srv://bilalburney14:3780353783@cluster0.v6ydmco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+2025-08-19 03:57:16.467 | INFO     | __main__:test_configuration:45 - ✓ MONGODB_DATABASE_NAME: fyp_data
+2025-08-19 03:57:16.468 | SUCCESS  | __main__:test_configuration:54 - ✅ All configuration settings are present
+2025-08-19 03:57:16.468 | INFO     | __main__:test_configuration:55 - Found 4 required settings

@@ -10,7 +10,8 @@ from pathlib import Path
 from loguru import logger
 
 # Add the src directory to Python path (from test_scripts directory)
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 
 # Configure logger
 logger.remove()
@@ -23,9 +24,9 @@ async def test_match_agent():
     logger.info("🎯 Testing Match Finding Agent...")
     
     try:
-        from src.agent.domain.fyp_data import Fyp_data
-        from src.agent.domain.metadata import Metadata
-        from src.agent.application.agents.graphs.build_find_match_graph import MatcherGraphRunner
+        from agent.domain.fyp_data import Fyp_data
+        from agent.domain.metadata import Metadata
+        from agent.application.agents.graphs.build_find_match_graph import MatcherGraphRunner
         
         # Create a sample query profile
         logger.info("Creating sample query profile...")
@@ -89,7 +90,7 @@ async def test_match_agent():
             logger.warning("   - Issues with the matching algorithm")
             
             # Check if database has data
-            from src.agent.infrastructure.mongo.service import MongoDBService
+            from agent.infrastructure.mongo.service import MongoDBService
             with MongoDBService(
                 model=Fyp_data,
                 collection_name="std_profiles"
