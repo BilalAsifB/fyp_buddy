@@ -9,7 +9,7 @@ from pathlib import Path
 from loguru import logger
 
 # Add the src directory to Python path (from test_scripts directory)
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 
 # Configure logger

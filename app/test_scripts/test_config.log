@@ -22,3 +22,19 @@
 2025-08-19 03:57:16.467 | INFO     | __main__:test_configuration:45 - ✓ MONGODB_DATABASE_NAME: fyp_data
 2025-08-19 03:57:16.468 | SUCCESS  | __main__:test_configuration:54 - ✅ All configuration settings are present
 2025-08-19 03:57:16.468 | INFO     | __main__:test_configuration:55 - Found 4 required settings
+2025-08-19 04:20:46.860 | INFO     | __main__:test_configuration:21 - 🔧 Testing Configuration...
+2025-08-19 04:20:46.987 | INFO     | agent.config:<module>:59 - Configuration loaded successfully
+2025-08-19 04:20:46.987 | INFO     | __main__:test_configuration:43 - ✓ GROQ_API_KEY: [CONFIGURED]
+2025-08-19 04:20:46.987 | INFO     | __main__:test_configuration:43 - ✓ LANGSMITH_API_KEY: [CONFIGURED]
+2025-08-19 04:20:46.987 | INFO     | __main__:test_configuration:45 - ✓ MONGODB_URI: mongodb+srv://bilalburney14:3780353783@cluster0.v6ydmco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+2025-08-19 04:20:46.987 | INFO     | __main__:test_configuration:45 - ✓ MONGODB_DATABASE_NAME: fyp_data
+2025-08-19 04:20:46.988 | SUCCESS  | __main__:test_configuration:54 - ✅ All configuration settings are present
+2025-08-19 04:20:46.988 | INFO     | __main__:test_configuration:55 - Found 4 required settings
+2025-08-19 04:24:40.838 | INFO     | __main__:test_configuration:21 - 🔧 Testing Configuration...
+2025-08-19 04:24:40.977 | INFO     | src.agent.config:<module>:59 - Configuration loaded successfully
+2025-08-19 04:24:40.978 | INFO     | __main__:test_configuration:43 - ✓ GROQ_API_KEY: [CONFIGURED]
+2025-08-19 04:24:40.978 | INFO     | __main__:test_configuration:43 - ✓ LANGSMITH_API_KEY: [CONFIGURED]
+2025-08-19 04:24:40.978 | INFO     | __main__:test_configuration:45 - ✓ MONGODB_URI: mongodb+srv://bilalburney14:3780353783@cluster0.v6ydmco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+2025-08-19 04:24:40.978 | INFO     | __main__:test_configuration:45 - ✓ MONGODB_DATABASE_NAME: fyp_data
+2025-08-19 04:24:40.978 | SUCCESS  | __main__:test_configuration:54 - ✅ All configuration settings are present
+2025-08-19 04:24:40.979 | INFO     | __main__:test_configuration:55 - Found 4 required settings
