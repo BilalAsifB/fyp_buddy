@@ -4,11 +4,17 @@ import logging
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ValidationError
+from typing import List
 
 # Import your LangGraph graphs
 from src.agent.application.agents.graphs.build_proj_gen_graph import projects_agent
 from src.agent.application.agents.graphs.build_interest_gen_graph import interests_agent
 from src.agent.application.agents.graphs.build_find_match_graph import match_agent
+
+# Import domain models and services
+from src.agent.domain.fyp_data import Fyp_data
+from src.agent.domain.metadata import Metadata
+from src.agent.infrastructure.mongo.service import MongoDBService
 
 # ---------------------------------------------------
 # Logging
@@ -46,11 +52,30 @@ class ProjectRequest(BaseModel):
 
 class InterestRequest(BaseModel):
     student_id: str
-    interests: list[str]
+    interests: List[str]
 
 class MatchRequest(BaseModel):
     project_domain: str
-    student_interests: list[str]
+    student_interests: List[str]
+
+class MetadataRequest(BaseModel):
+    id: str
+    department: str
+    year: int
+    gpa: float
+    gender: str
+    skills: List[str]
+    email: str
+
+class UserIngestionRequest(BaseModel):
+    id: str
+    title: str
+    domain: str
+    idea: str
+    tech_stack: List[str]
+    interests: List[str]
+    score: float
+    metadata: MetadataRequest
 
 # ---------------------------------------------------
 # Routes
@@ -84,14 +109,94 @@ async def generate_interests(req: InterestRequest):
 @app.post("/find_matches")
 async def find_matches(req: MatchRequest):
     try:
+        # Create a query object for the match agent
+        query_metadata = Metadata(
+            id="query_user",
+            department="",
+            year=0,
+            gpa=0.0,
+            gender="",
+            skills=[],
+            email=""
+        )
+        
+        query_data = Fyp_data(
+            id="query_user",
+            title="",
+            domain=req.project_domain,
+            idea="",
+            tech_stack=[],
+            interests=req.student_interests,
+            score=0.0,
+            metadata=query_metadata
+        )
+        
         result = match_agent.invoke({
-            "project_domain": req.project_domain,
-            "student_interests": req.student_interests
+            "query": query_data,
+            "all_data": [],
+            "done": False,
+            "offset": 0,
+            "limit": 20,
+            "results": {}
         })
         return {"success": True, "result": result}
     except Exception as e:
         logger.error(f"Error in /find_matches: {e}")
         raise HTTPException(status_code=500, detail="Match finding failed")
+
+@app.post("/ingest_user")
+async def ingest_user(req: UserIngestionRequest):
+    """Ingest user data into MongoDB collection."""
+    try:
+        # Convert request to Fyp_data model
+        metadata = Metadata(
+            id=req.metadata.id,
+            department=req.metadata.department,
+            year=req.metadata.year,
+            gpa=req.metadata.gpa,
+            gender=req.metadata.gender,
+            skills=req.metadata.skills,
+            email=req.metadata.email
+        )
+        
+        user_data = Fyp_data(
+            id=req.id,
+            title=req.title,
+            domain=req.domain,
+            idea=req.idea,
+            tech_stack=req.tech_stack,
+            interests=req.interests,
+            score=req.score,
+            metadata=metadata
+        )
+        
+        # Ingest into MongoDB
+        with MongoDBService(
+            model=Fyp_data,
+            collection_name="std_profiles"
+        ) as service:
+            service.ingest_documents([user_data])
+        
+        logger.info(f"Successfully ingested user data for ID: {req.id}")
+        return {"success": True, "message": "User data ingested successfully"}
+    except Exception as e:
+        logger.error(f"Error in /ingest_user: {e}")
+        raise HTTPException(status_code=500, detail="User ingestion failed")
+
+@app.get("/stats")
+async def get_stats():
+    """Get database statistics."""
+    try:
+        with MongoDBService(
+            model=Fyp_data,
+            collection_name="std_profiles"
+        ) as service:
+            count = service.get_collection_count()
+        
+        return {"success": True, "total_profiles": count}
+    except Exception as e:
+        logger.error(f"Error in /stats: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get stats")
 
 # ---------------------------------------------------
 # Global error handler (bad JSON, validation, etc.)
