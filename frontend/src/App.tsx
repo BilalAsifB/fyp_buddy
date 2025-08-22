@@ -1,56 +1,89 @@
+// src/App.tsx
 import { useState } from "react";
-import Results from "./components/Results";
-import LoadingSpinner from "./components/LoadingSpinner";
-import { MatchResponse } from "./types";
-
+import UserForm from "./components/UserForm";
+import MatchResults from "./components/MatchResults";
+import ConnectionStatus from "./components/ConnectionStatus";
+import { findMatches } from "./services/apiService";
+import type { Match, UserData } from "./types";
 
 export default function App() {
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<MatchResponse | null>(null);
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  // Example fake fetch
-  const fetchMatches = async () => {
+  const handleFindMatches = async (userData: UserData) => {
     setLoading(true);
-    setTimeout(() => {
-      const fakeResults: MatchResponse = {
-        all_data: [
-          {
-            id: "1",
-            name: "Alice",
-            skills: ["Python", "ML"],
-            project: "AI Research Assistant",
-          },
-          {
-            id: "2",
-            name: "Bob",
-            skills: ["React", "Node.js"],
-            project: "Web Platform",
-          },
-        ],
-        results: {
-          "1": 92,
-          "2": 85,
-        },
-      };
-      setResults(fakeResults);
+    setError(null);
+    setHasSearched(true);
+
+    try {
+      const matchResults = await findMatches(userData);
+      setMatches(matchResults);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to find matches";
+      setError(errorMessage);
+      setMatches([]);
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
+  };
+
+  const resetSearch = () => {
+    setMatches([]);
+    setError(null);
+    setHasSearched(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">FYP Buddy</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <ConnectionStatus />
+      
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            FYP BUDDY
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Find the perfect Final Year Project partners based on your interests and skills
+          </p>
+        </div>
 
-      <button
-        onClick={fetchMatches}
-        className="px-6 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition"
-      >
-        Find Matches
-      </button>
+        {/* Main Content */}
+        <div className="max-w-6xl mx-auto space-y-8">
+          {/* Search Form */}
+          {!hasSearched && (
+            <UserForm onSubmit={handleFindMatches} loading={loading} />
+          )}
 
-      <div className="mt-6 w-full max-w-2xl">
-        {loading && <LoadingSpinner />}
-        {results && <Results results={results} />}
+          {/* Results Section */}
+          {hasSearched && (
+            <div className="space-y-6">
+              {/* Reset Button */}
+              <div className="flex justify-center">
+                <button
+                  onClick={resetSearch}
+                  className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  New Search
+                </button>
+              </div>
+
+              {/* Results */}
+              <MatchResults 
+                matches={matches} 
+                error={error} 
+                loading={loading} 
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <footer className="mt-16 text-center text-gray-500 text-sm">
+          <p>© 2025 FYP Buddy - Connecting students for amazing projects</p>
+        </footer>
       </div>
     </div>
   );

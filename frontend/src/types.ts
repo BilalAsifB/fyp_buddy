@@ -1,15 +1,53 @@
 // src/types.ts
 
-// One student's FYP data
-export interface FypData {
+export interface Metadata {
   id: string;
-  name: string;
+  department: string;
+  year: number;
+  gpa: number;
+  gender: string;
   skills: string[];
-  project: string;
+  email: string;
 }
 
-// Match response coming from backend
+export interface Match {
+  id: string;
+  title: string;
+  domain: string;
+  idea: string;
+  tech_stack: string[];
+  interests: string[];
+  score: number;
+  metadata: Metadata;
+}
+
+export interface UserData {
+  project_domain: string;
+  student_interests: string[];
+}
+
+export interface MatchRequest {
+  project_domain: string;
+  student_interests: string[];
+}
+
 export interface MatchResponse {
-  all_data: FypData[];                 // list of top matches
-  results: Record<string, number>;     // { studentId: score }
+  success: boolean;
+  result: {
+    all_data: Match[];
+    query: Match;
+    done: boolean;
+    offset: number;
+    limit: number;
+    results: Record<string, number>;
+  };
+}
+
+export interface ProjectRequest {
+  domain: string;
+}
+
+export interface InterestRequest {
+  student_id: string;
+  interests: string[];
 }

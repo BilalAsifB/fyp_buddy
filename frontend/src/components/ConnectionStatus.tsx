@@ -1,34 +1,30 @@
+// src/components/ConnectionStatus.tsx
 import { useEffect, useState } from "react";
-
-const BACKEND_URL =
-  import.meta.env.VITE_BACKEND_URL ||
-  (import.meta.env.DEV
-    ? "http://localhost:8000"
-    : "https://your-azure-container-app-url.azurecontainerapps.io");
+import { checkHealth } from "../services/apiService";
 
 export default function ConnectionStatus() {
-  const [status, setStatus] = useState<"online" | "offline" | "connecting">(
-    "connecting"
-  );
+  const [status, setStatus] = useState<"online" | "offline" | "connecting">("connecting");
 
   useEffect(() => {
     let isMounted = true;
 
     const checkConnection = async () => {
       try {
-        const response = await fetch(`${BACKEND_URL}/health`);
-        if (!isMounted) return;
-        if (response.ok) {
-          setStatus("online");
-        } else {
-          setStatus("offline");
+        const isHealthy = await checkHealth();
+        if (isMounted) {
+          setStatus(isHealthy ? "online" : "offline");
         }
       } catch {
-        if (isMounted) setStatus("offline");
+        if (isMounted) {
+          setStatus("offline");
+        }
       }
     };
 
+    // Initial check
     checkConnection();
+    
+    // Check every 30 seconds
     const interval = setInterval(checkConnection, 30000);
 
     return () => {
@@ -37,23 +33,34 @@ export default function ConnectionStatus() {
     };
   }, []);
 
+  const statusConfig = {
+    online: {
+      className: "bg-green-100 text-green-800 border-green-200",
+      icon: "🟢",
+      text: "Connected",
+    },
+    offline: {
+      className: "bg-red-100 text-red-800 border-red-200",
+      icon: "🔴",
+      text: "Offline",
+    },
+    connecting: {
+      className: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      icon: "🟡",
+      text: "Connecting...",
+    },
+  };
+
+  const config = statusConfig[status];
+
   return (
-    <div className="fixed top-4 right-4">
-      <span
-        className={`px-3 py-1 rounded-full text-sm font-medium ${
-          status === "online"
-            ? "bg-green-100 text-green-700"
-            : status === "offline"
-            ? "bg-red-100 text-red-700"
-            : "bg-yellow-100 text-yellow-700"
-        }`}
-      >
-        {status === "online"
-          ? "🟢 Connected"
-          : status === "offline"
-          ? "🔴 Offline"
-          : "🟡 Connecting..."}
-      </span>
+    <div className="fixed top-4 right-4 z-50">
+      <div className={`px-3 py-2 rounded-lg text-sm font-medium border shadow-sm ${config.className}`}>
+        <span className="flex items-center gap-2">
+          <span>{config.icon}</span>
+          {config.text}
+        </span>
+      </div>
     </div>
   );
 }
