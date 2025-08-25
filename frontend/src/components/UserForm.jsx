@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 export default function UserForm() {
   const currentYear = new Date().getFullYear();
@@ -27,7 +27,7 @@ export default function UserForm() {
 
   const [tempInput, setTempInput] = useState({ skill: "", interest: "", tech: "" });
 
-  // Validation checks
+  // ✅ Personal Info validation
   const isPersonalInfoValid = () => {
     const { id, department, batch, gender, cgpa, email } = formData.personalInfo;
     const idRegex = /^\d{2}[A-Z]-\d{4}$/; // e.g., 22K-1234
@@ -43,8 +43,8 @@ export default function UserForm() {
     return (
       idRegex.test(id) &&
       validDepartments.includes(department) &&
-      batch <= currentYear &&
-      batch >= currentYear - 3 &&
+      Number(batch) <= currentYear - 3 &&
+      Number(batch) >= currentYear - 6 &&
       gender &&
       parseFloat(cgpa) >= 2.0 &&
       parseFloat(cgpa) <= 4.0 &&
@@ -52,10 +52,15 @@ export default function UserForm() {
     );
   };
 
+  // ✅ Skills & Interests validation
   const isSkillsInterestsValid = () => {
-    return formData.skillsInterests.skills.length > 0 && formData.skillsInterests.interests.length > 0;
+    return (
+      formData.skillsInterests.skills.length > 0 &&
+      formData.skillsInterests.interests.length > 0
+    );
   };
 
+  // Add skill / interest / tech
   const handleAddItem = (field, type) => {
     if (tempInput[type].trim() === "") return;
     setFormData((prev) => ({
@@ -68,6 +73,7 @@ export default function UserForm() {
     setTempInput({ ...tempInput, [type]: "" });
   };
 
+  // Remove skill / interest / tech
   const handleRemoveItem = (field, type, index) => {
     setFormData((prev) => ({
       ...prev,
@@ -78,25 +84,49 @@ export default function UserForm() {
     }));
   };
 
-  const handleSubmit = () => {
-    console.log("Final Submitted Data:", formData);
-    alert("Form submitted! Check console for output.");
+  // Final Submit
+  const handleSubmit = async () => {
+    const payload = {
+      id: formData.personalInfo.id,
+      title: formData.projectInfo.title || "N/A",
+      domain: formData.projectInfo.domain || "N/A",
+      idea: formData.projectInfo.idea || "N/A",
+      tech_stack: formData.projectInfo.techStack,
+      interests: formData.skillsInterests.interests,
+      score: 0.0,
+      metadata: {
+        id: formData.personalInfo.id,
+        department: formData.personalInfo.department,
+        year: parseInt(formData.personalInfo.batch),
+        gpa: parseFloat(formData.personalInfo.cgpa),
+        gender: formData.personalInfo.gender,
+        skills: formData.skillsInterests.skills,
+        email: formData.personalInfo.email,
+      },
+    };
+
+    console.log("✅ Final Submitted Payload:", payload);
+    alert("Form submitted! Check console for payload.");
   };
 
   return (
     <div>
       {/* Progress Bar */}
       <div className="flex justify-between mb-6">
-        {["Personal Info", "Skills & Interests", "Project Info", "Review"].map((label, index) => (
-          <div
-            key={index}
-            className={`flex-1 text-center py-2 rounded-lg text-sm font-medium ${
-              step === index + 1 ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600"
-            }`}
-          >
-            {label}
-          </div>
-        ))}
+        {["Personal Info", "Skills & Interests", "Project Info", "Review"].map(
+          (label, index) => (
+            <div
+              key={index}
+              className={`flex-1 text-center py-2 rounded-lg text-sm font-medium ${
+                step === index + 1
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-600"
+              }`}
+            >
+              {label}
+            </div>
+          )
+        )}
       </div>
 
       {/* Step 1: Personal Info */}
@@ -108,14 +138,23 @@ export default function UserForm() {
             className="w-full p-2 border rounded-lg"
             value={formData.personalInfo.id}
             onChange={(e) =>
-              setFormData({ ...formData, personalInfo: { ...formData.personalInfo, id: e.target.value } })
+              setFormData({
+                ...formData,
+                personalInfo: { ...formData.personalInfo, id: e.target.value },
+              })
             }
           />
           <select
             className="w-full p-2 border rounded-lg"
             value={formData.personalInfo.department}
             onChange={(e) =>
-              setFormData({ ...formData, personalInfo: { ...formData.personalInfo, department: e.target.value } })
+              setFormData({
+                ...formData,
+                personalInfo: {
+                  ...formData.personalInfo,
+                  department: e.target.value,
+                },
+              })
             }
           >
             <option value="">Select Department</option>
@@ -131,14 +170,26 @@ export default function UserForm() {
             className="w-full p-2 border rounded-lg"
             value={formData.personalInfo.batch}
             onChange={(e) =>
-              setFormData({ ...formData, personalInfo: { ...formData.personalInfo, batch: e.target.value } })
+              setFormData({
+                ...formData,
+                personalInfo: {
+                  ...formData.personalInfo,
+                  batch: e.target.value,
+                },
+              })
             }
           />
           <select
             className="w-full p-2 border rounded-lg"
             value={formData.personalInfo.gender}
             onChange={(e) =>
-              setFormData({ ...formData, personalInfo: { ...formData.personalInfo, gender: e.target.value } })
+              setFormData({
+                ...formData,
+                personalInfo: {
+                  ...formData.personalInfo,
+                  gender: e.target.value,
+                },
+              })
             }
           >
             <option value="">Select Gender</option>
@@ -153,7 +204,13 @@ export default function UserForm() {
             className="w-full p-2 border rounded-lg"
             value={formData.personalInfo.cgpa}
             onChange={(e) =>
-              setFormData({ ...formData, personalInfo: { ...formData.personalInfo, cgpa: e.target.value } })
+              setFormData({
+                ...formData,
+                personalInfo: {
+                  ...formData.personalInfo,
+                  cgpa: e.target.value,
+                },
+              })
             }
           />
           <input
@@ -162,7 +219,13 @@ export default function UserForm() {
             className="w-full p-2 border rounded-lg"
             value={formData.personalInfo.email}
             onChange={(e) =>
-              setFormData({ ...formData, personalInfo: { ...formData.personalInfo, email: e.target.value } })
+              setFormData({
+                ...formData,
+                personalInfo: {
+                  ...formData.personalInfo,
+                  email: e.target.value,
+                },
+              })
             }
           />
         </div>
@@ -180,7 +243,9 @@ export default function UserForm() {
                 placeholder="Enter a skill"
                 className="flex-1 p-2 border rounded-lg"
                 value={tempInput.skill}
-                onChange={(e) => setTempInput({ ...tempInput, skill: e.target.value })}
+                onChange={(e) =>
+                  setTempInput({ ...tempInput, skill: e.target.value })
+                }
               />
               <button
                 type="button"
@@ -197,7 +262,12 @@ export default function UserForm() {
                   className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
                 >
                   {s}
-                  <button type="button" onClick={() => handleRemoveItem("skillsInterests", "skill", i)}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleRemoveItem("skillsInterests", "skill", i)
+                    }
+                  >
                     ❌
                   </button>
                 </span>
@@ -214,7 +284,9 @@ export default function UserForm() {
                 placeholder="Enter an interest"
                 className="flex-1 p-2 border rounded-lg"
                 value={tempInput.interest}
-                onChange={(e) => setTempInput({ ...tempInput, interest: e.target.value })}
+                onChange={(e) =>
+                  setTempInput({ ...tempInput, interest: e.target.value })
+                }
               />
               <button
                 type="button"
@@ -231,7 +303,12 @@ export default function UserForm() {
                   className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
                 >
                   {s}
-                  <button type="button" onClick={() => handleRemoveItem("skillsInterests", "interest", i)}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleRemoveItem("skillsInterests", "interest", i)
+                    }
+                  >
                     ❌
                   </button>
                 </span>
@@ -250,7 +327,13 @@ export default function UserForm() {
             className="w-full p-2 border rounded-lg"
             value={formData.projectInfo.title}
             onChange={(e) =>
-              setFormData({ ...formData, projectInfo: { ...formData.projectInfo, title: e.target.value } })
+              setFormData({
+                ...formData,
+                projectInfo: {
+                  ...formData.projectInfo,
+                  title: e.target.value,
+                },
+              })
             }
           />
           <input
@@ -259,7 +342,13 @@ export default function UserForm() {
             className="w-full p-2 border rounded-lg"
             value={formData.projectInfo.domain}
             onChange={(e) =>
-              setFormData({ ...formData, projectInfo: { ...formData.projectInfo, domain: e.target.value } })
+              setFormData({
+                ...formData,
+                projectInfo: {
+                  ...formData.projectInfo,
+                  domain: e.target.value,
+                },
+              })
             }
           />
           <textarea
@@ -267,10 +356,15 @@ export default function UserForm() {
             className="w-full p-2 border rounded-lg"
             value={formData.projectInfo.idea}
             onChange={(e) =>
-              setFormData({ ...formData, projectInfo: { ...formData.projectInfo, idea: e.target.value } })
+              setFormData({
+                ...formData,
+                projectInfo: {
+                  ...formData.projectInfo,
+                  idea: e.target.value,
+                },
+              })
             }
           />
-          {/* Tech stack input */}
           <div>
             <label className="block font-medium mb-2">Tech Stack</label>
             <div className="flex gap-2">
@@ -296,7 +390,10 @@ export default function UserForm() {
                   className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
                 >
                   {t}
-                  <button type="button" onClick={() => handleRemoveItem("projectInfo", "tech", i)}>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveItem("projectInfo", "tech", i)}
+                  >
                     ❌
                   </button>
                 </span>
@@ -319,10 +416,10 @@ export default function UserForm() {
             <p><strong>Email:</strong> {formData.personalInfo.email}</p>
             <p><strong>Skills:</strong> {formData.skillsInterests.skills.join(", ")}</p>
             <p><strong>Interests:</strong> {formData.skillsInterests.interests.join(", ")}</p>
-            <p><strong>Project Title:</strong> {formData.projectInfo.title}</p>
-            <p><strong>Domain:</strong> {formData.projectInfo.domain}</p>
-            <p><strong>Idea:</strong> {formData.projectInfo.idea}</p>
-            <p><strong>Tech Stack:</strong> {formData.projectInfo.techStack.join(", ")}</p>
+            <p><strong>Project Title:</strong> {formData.projectInfo.title || "N/A"}</p>
+            <p><strong>Domain:</strong> {formData.projectInfo.domain || "N/A"}</p>
+            <p><strong>Idea:</strong> {formData.projectInfo.idea || "N/A"}</p>
+            <p><strong>Tech Stack:</strong> {formData.projectInfo.techStack.join(", ") || "N/A"}</p>
           </div>
         </div>
       )}
@@ -354,9 +451,13 @@ export default function UserForm() {
             )}
             <button
               onClick={() => setStep(step + 1)}
-              disabled={(step === 1 && !isPersonalInfoValid()) || (step === 2 && !isSkillsInterestsValid())}
+              disabled={
+                (step === 1 && !isPersonalInfoValid()) ||
+                (step === 2 && !isSkillsInterestsValid())
+              }
               className={`px-6 py-2 rounded-lg text-white ${
-                (step === 1 && !isPersonalInfoValid()) || (step === 2 && !isSkillsInterestsValid())
+                (step === 1 && !isPersonalInfoValid()) ||
+                (step === 2 && !isSkillsInterestsValid())
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"
               }`}
