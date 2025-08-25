@@ -5,8 +5,9 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ValidationError
 from typing import List
+from fastapi.responses import JSONResponse
 
-# Import your LangGraph graphs
+# Import LangGraph graphs
 from src.agent.application.agents.graphs.build_proj_gen_graph import projects_agent
 from src.agent.application.agents.graphs.build_interest_gen_graph import interests_agent
 from src.agent.application.agents.graphs.build_find_match_graph import match_agent
@@ -34,7 +35,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS (allow frontend or external clients)
+# CORS
 origins = os.getenv("CORS_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
@@ -80,55 +81,51 @@ class UserIngestionRequest(BaseModel):
 # ---------------------------------------------------
 # Routes
 # ---------------------------------------------------
-@app.get("/")
+@app.get("/", tags=["Health"])
 def health_check():
     """Health check endpoint for monitoring."""
+    logger.info("✅ Health check called")
     return {"status": "ok", "service": "LangGraph API"}
 
-@app.post("/generate_project")
+@app.post("/generate_project", tags=["Projects"])
 async def generate_project(req: ProjectRequest):
     try:
+        logger.info(f"📥 /generate_project request: {req.json()}")
         result = projects_agent.invoke({"domain": req.domain})
+        logger.info(f"📤 /generate_project response: {result}")
         return {"success": True, "result": result}
     except Exception as e:
-        logger.error(f"Error in /generate_project: {e}")
+        logger.error(f"❌ Error in /generate_project: {e}")
         raise HTTPException(status_code=500, detail="Project generation failed")
 
-@app.post("/generate_interests")
+@app.post("/generate_interests", tags=["Interests"])
 async def generate_interests(req: InterestRequest):
     try:
+        logger.info(f"📥 /generate_interests request: {req.json()}")
         result = interests_agent.invoke({
             "student_id": req.student_id,
             "interests": req.interests
         })
+        logger.info(f"📤 /generate_interests response: {result}")
         return {"success": True, "result": result}
     except Exception as e:
-        logger.error(f"Error in /generate_interests: {e}")
+        logger.error(f"❌ Error in /generate_interests: {e}")
         raise HTTPException(status_code=500, detail="Interest generation failed")
 
-@app.post("/find_matches")
+@app.post("/find_matches", tags=["Matching"])
 async def find_matches(req: MatchRequest):
     try:
-        # Create a query object for the match agent
+        logger.info(f"📥 /find_matches request: {req.json()}")
+
+        # Build query object
         query_metadata = Metadata(
-            id="query_user",
-            department="",
-            year=0,
-            gpa=0.0,
-            gender="",
-            skills=[],
-            email=""
+            id="query_user", department="", year=0,
+            gpa=0.0, gender="", skills=[], email=""
         )
-        
         query_data = Fyp_data(
-            id="query_user",
-            title="",
-            domain=req.project_domain,
-            idea="",
-            tech_stack=[],
-            interests=req.student_interests,
-            score=0.0,
-            metadata=query_metadata
+            id="query_user", title="", domain=req.project_domain,
+            idea="", tech_stack=[], interests=req.student_interests,
+            score=0.0, metadata=query_metadata
         )
         
         result = match_agent.invoke({
@@ -139,68 +136,56 @@ async def find_matches(req: MatchRequest):
             "limit": 20,
             "results": {}
         })
+        logger.info(f"📤 /find_matches response: {result}")
         return {"success": True, "result": result}
     except Exception as e:
-        logger.error(f"Error in /find_matches: {e}")
+        logger.error(f"❌ Error in /find_matches: {e}")
         raise HTTPException(status_code=500, detail="Match finding failed")
 
-@app.post("/ingest_user")
+@app.post("/ingest_user", tags=["Users"])
 async def ingest_user(req: UserIngestionRequest):
     """Ingest user data into MongoDB collection."""
     try:
-        # Convert request to Fyp_data model
-        metadata = Metadata(
-            id=req.metadata.id,
-            department=req.metadata.department,
-            year=req.metadata.year,
-            gpa=req.metadata.gpa,
-            gender=req.metadata.gender,
-            skills=req.metadata.skills,
-            email=req.metadata.email
-        )
-        
+        logger.info(f"📥 /ingest_user request: {req.json()}")
+
+        # Convert request → Fyp_data model
+        metadata = Metadata(**req.metadata.dict())
         user_data = Fyp_data(
-            id=req.id,
-            title=req.title,
-            domain=req.domain,
-            idea=req.idea,
-            tech_stack=req.tech_stack,
-            interests=req.interests,
-            score=req.score,
+            id=req.id, title=req.title, domain=req.domain,
+            idea=req.idea, tech_stack=req.tech_stack,
+            interests=req.interests, score=req.score,
             metadata=metadata
         )
         
-        # Ingest into MongoDB
-        with MongoDBService(
-            model=Fyp_data,
-            collection_name="std_profiles"
-        ) as service:
+        with MongoDBService(model=Fyp_data, collection_name="std_profiles") as service:
             service.ingest_documents([user_data])
         
-        logger.info(f"Successfully ingested user data for ID: {req.id}")
+        logger.info(f"✅ Successfully ingested user data for ID: {req.id}")
         return {"success": True, "message": "User data ingested successfully"}
     except Exception as e:
-        logger.error(f"Error in /ingest_user: {e}")
+        logger.error(f"❌ Error in /ingest_user: {e}")
         raise HTTPException(status_code=500, detail="User ingestion failed")
 
-@app.get("/stats")
+@app.get("/stats", tags=["Stats"])
 async def get_stats():
     """Get database statistics."""
     try:
-        with MongoDBService(
-            model=Fyp_data,
-            collection_name="std_profiles"
-        ) as service:
+        with MongoDBService(model=Fyp_data, collection_name="std_profiles") as service:
             count = service.get_collection_count()
         
+        logger.info(f"📊 Stats requested, total profiles = {count}")
         return {"success": True, "total_profiles": count}
     except Exception as e:
-        logger.error(f"Error in /stats: {e}")
+        logger.error(f"❌ Error in /stats: {e}")
         raise HTTPException(status_code=500, detail="Failed to get stats")
 
 # ---------------------------------------------------
-# Global error handler (bad JSON, validation, etc.)
+# Global error handler
 # ---------------------------------------------------
 @app.exception_handler(ValidationError)
 async def validation_exception_handler(request: Request, exc: ValidationError):
-    return HTTPException(status_code=422, detail=exc.errors())
+    logger.error(f"❌ Validation error: {exc.errors()}")
+    return JSONResponse(
+        status_code=422,
+        content={"success": False, "errors": exc.errors()}
+    )
