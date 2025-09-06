@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  fyp-backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: fyp-backend
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_DATABASE_NAME=${MONGODB_DATABASE_NAME:-fyp_data}
+      - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}
+      - LANGSMITH_TRACING=${LANGSMITH_TRACING:-true}
+      - LANGSMITH_ENDPOINT=${LANGSMITH_ENDPOINT:-https://api.smith.langchain.com}
+      - LANGSMITH_PROJECT=${LANGSMITH_PROJECT:-fyp-agent-api}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
+      - PORT=8000
+    volumes:
+      # Mount .env file if it exists locally (for development)
+      - ./.env:/app/.env:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - fyp-network
+
+networks:
+  fyp-network:
+    driver: bridge
