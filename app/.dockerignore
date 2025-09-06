@@ -37,6 +37,24 @@ MANIFEST
 htmlcov/
 .tox/
 .nox/
+test_scripts/
+tests/
+**/test_*.py
+**/tests/
+**/*_test.py
+pytest.ini
+conftest.py
+
+# Test logs and reports
+*.log
+test_report_*.json
+run_all_tests.log
+test_config.log
+test_mongodb.log
+test_project_agent.log
+test_interest_agent.log
+test_match_agent.log
+test_error_handling.log
 
 # Documentation
 docs/_build/
