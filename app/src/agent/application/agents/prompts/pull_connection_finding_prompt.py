@@ -1,0 +1,23 @@
+from loguru import logger
+
+from langchain.prompts import ChatPromptTemplate
+
+from langsmith import Client
+from langsmith.utils import LangSmithUserError
+
+from src.agent.config import settings
+
+def pull_connection_finding_prompt() -> ChatPromptTemplate:
+    '''
+    Pulls prompt from LangSmith.
+    '''
+    try:
+        client = Client(api_key=settings.LANGSMITH_API_KEY)
+        prompt = client.pull_prompt("finding_connections", include_model=True)
+
+        logger.info("Prompt successfully pulled.")
+    except LangSmithUserError as e:
+        logger.error(f"Failed to pull prompt: {e}")
+        raise
+
+    return prompt

@@ -1,0 +1,75 @@
+2025-08-19 04:37:44.742 | INFO     | __main__:test_mongodb_connection:22 - 🗄️  Testing MongoDB Connection...
+2025-08-19 04:37:45.238 | INFO     | src.agent.config:<module>:59 - Configuration loaded successfully
+2025-08-19 04:37:45.336 | INFO     | __main__:test_mongodb_connection:29 - Testing basic MongoDB connection...
+2025-08-19 04:37:47.555 | INFO     | src.agent.infrastructure.mongo.service:__init__:71 - Connected to MongoDB instance:
+ URI: mongodb+srv://bilalburney14:3780353783@cluster0.v6ydmco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+ Database: fyp_data
+ Collection: test_connection
+2025-08-19 04:37:47.708 | INFO     | __main__:test_mongodb_connection:35 - ✓ Connected to MongoDB successfully
+2025-08-19 04:37:47.709 | INFO     | __main__:test_mongodb_connection:36 - ✓ Test collection has 0 documents
+2025-08-19 04:37:47.864 | DEBUG    | src.agent.infrastructure.mongo.service:close:227 - Closed MongoDB connection.
+2025-08-19 04:37:47.865 | INFO     | __main__:test_mongodb_connection:39 - Checking std_profiles collection...
+2025-08-19 04:37:49.881 | INFO     | src.agent.infrastructure.mongo.service:__init__:71 - Connected to MongoDB instance:
+ URI: mongodb+srv://bilalburney14:3780353783@cluster0.v6ydmco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+ Database: fyp_data
+ Collection: std_profiles
+2025-08-19 04:37:50.038 | INFO     | __main__:test_mongodb_connection:45 - ✓ std_profiles collection has 200 documents
+2025-08-19 04:37:50.039 | INFO     | __main__:test_mongodb_connection:53 - Testing document retrieval...
+2025-08-19 04:37:50.195 | DEBUG    | src.agent.infrastructure.mongo.service:fetch_documents:168 - Fetched 1 documents with query: {}, offset: 0, limit: 1
+2025-08-19 04:37:50.196 | INFO     | __main__:test_mongodb_connection:57 - ✓ Sample document structure valid
+2025-08-19 04:37:50.196 | DEBUG    | __main__:test_mongodb_connection:58 - Sample title: AI-Powered Mental Health Chatbot
+2025-08-19 04:37:50.196 | DEBUG    | __main__:test_mongodb_connection:59 - Sample domain: Artificial Intelligence
+2025-08-19 04:37:50.354 | DEBUG    | src.agent.infrastructure.mongo.service:close:227 - Closed MongoDB connection.
+2025-08-19 04:37:50.355 | SUCCESS  | __main__:test_mongodb_connection:63 - ✅ MongoDB connection test passed
+2025-08-22 04:47:05.276 | INFO     | __main__:test_mongodb_connection:22 - 🗄️  Testing MongoDB Connection...
+2025-08-22 04:47:05.758 | INFO     | src.agent.config:<module>:59 - Configuration loaded successfully
+2025-08-22 04:47:05.854 | INFO     | __main__:test_mongodb_connection:29 - Testing basic MongoDB connection...
+2025-08-22 04:47:36.892 | ERROR    | src.agent.infrastructure.mongo.service:__init__:66 - Failed to initialize MongoDBService: SSL handshake failed: ac-ajltgha-shard-00-02.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),SSL handshake failed: ac-ajltgha-shard-00-00.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),SSL handshake failed: ac-ajltgha-shard-00-01.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68a7aff900364c73b1d8fb7e, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-ajltgha-shard-00-00.v6ydmco.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ajltgha-shard-00-00.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ajltgha-shard-00-01.v6ydmco.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ajltgha-shard-00-01.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ajltgha-shard-00-02.v6ydmco.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ajltgha-shard-00-02.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-08-22 04:47:36.893 | ERROR    | __main__:test_mongodb_connection:70 - ❌ MongoDB connection test failed: SSL handshake failed: ac-ajltgha-shard-00-02.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),SSL handshake failed: ac-ajltgha-shard-00-00.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),SSL handshake failed: ac-ajltgha-shard-00-01.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68a7aff900364c73b1d8fb7e, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-ajltgha-shard-00-00.v6ydmco.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ajltgha-shard-00-00.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ajltgha-shard-00-01.v6ydmco.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ajltgha-shard-00-01.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ajltgha-shard-00-02.v6ydmco.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ajltgha-shard-00-02.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-08-22 04:47:36.893 | DEBUG    | __main__:test_mongodb_connection:71 - Full error: ServerSelectionTimeoutError: SSL handshake failed: ac-ajltgha-shard-00-02.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),SSL handshake failed: ac-ajltgha-shard-00-00.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),SSL handshake failed: ac-ajltgha-shard-00-01.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68a7aff900364c73b1d8fb7e, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-ajltgha-shard-00-00.v6ydmco.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ajltgha-shard-00-00.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ajltgha-shard-00-01.v6ydmco.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ajltgha-shard-00-01.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ajltgha-shard-00-02.v6ydmco.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ajltgha-shard-00-02.v6ydmco.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-08-22 04:48:20.286 | INFO     | __main__:test_mongodb_connection:22 - 🗄️  Testing MongoDB Connection...
+2025-08-22 04:48:20.815 | INFO     | src.agent.config:<module>:59 - Configuration loaded successfully
+2025-08-22 04:48:20.924 | INFO     | __main__:test_mongodb_connection:29 - Testing basic MongoDB connection...
+2025-08-22 04:48:27.552 | INFO     | src.agent.infrastructure.mongo.service:__init__:71 - Connected to MongoDB instance:
+ URI: mongodb+srv://bilalburney14:3780353783@cluster0.v6ydmco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+ Database: fyp_data
+ Collection: test_connection
+2025-08-22 04:48:27.705 | INFO     | __main__:test_mongodb_connection:35 - ✓ Connected to MongoDB successfully
+2025-08-22 04:48:27.706 | INFO     | __main__:test_mongodb_connection:36 - ✓ Test collection has 0 documents
+2025-08-22 04:48:27.861 | DEBUG    | src.agent.infrastructure.mongo.service:close:227 - Closed MongoDB connection.
+2025-08-22 04:48:27.861 | INFO     | __main__:test_mongodb_connection:39 - Checking std_profiles collection...
+2025-08-22 04:48:29.615 | INFO     | src.agent.infrastructure.mongo.service:__init__:71 - Connected to MongoDB instance:
+ URI: mongodb+srv://bilalburney14:3780353783@cluster0.v6ydmco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+ Database: fyp_data
+ Collection: std_profiles
+2025-08-22 04:48:29.774 | INFO     | __main__:test_mongodb_connection:45 - ✓ std_profiles collection has 200 documents
+2025-08-22 04:48:29.774 | INFO     | __main__:test_mongodb_connection:53 - Testing document retrieval...
+2025-08-22 04:48:29.928 | DEBUG    | src.agent.infrastructure.mongo.service:fetch_documents:168 - Fetched 1 documents with query: {}, offset: 0, limit: 1
+2025-08-22 04:48:29.928 | INFO     | __main__:test_mongodb_connection:57 - ✓ Sample document structure valid
+2025-08-22 04:48:29.929 | DEBUG    | __main__:test_mongodb_connection:58 - Sample title: AI-Powered Mental Health Chatbot
+2025-08-22 04:48:29.929 | DEBUG    | __main__:test_mongodb_connection:59 - Sample domain: Artificial Intelligence
+2025-08-22 04:48:30.085 | DEBUG    | src.agent.infrastructure.mongo.service:close:227 - Closed MongoDB connection.
+2025-08-22 04:48:30.086 | SUCCESS  | __main__:test_mongodb_connection:63 - ✅ MongoDB connection test passed
+2025-08-26 00:51:41.347 | INFO     | __main__:test_mongodb_connection:22 - 🗄️  Testing MongoDB Connection...
+2025-08-26 00:51:42.057 | INFO     | src.agent.config:<module>:59 - Configuration loaded successfully
+2025-08-26 00:51:42.302 | INFO     | __main__:test_mongodb_connection:29 - Testing basic MongoDB connection...
+2025-08-26 00:51:44.464 | INFO     | src.agent.infrastructure.mongo.service:__init__:71 - Connected to MongoDB instance:
+ URI: mongodb+srv://bilalburney14:3780353783@cluster0.v6ydmco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+ Database: fyp_data
+ Collection: test_connection
+2025-08-26 00:51:45.021 | INFO     | __main__:test_mongodb_connection:35 - ✓ Connected to MongoDB successfully
+2025-08-26 00:51:45.022 | INFO     | __main__:test_mongodb_connection:36 - ✓ Test collection has 0 documents
+2025-08-26 00:51:45.176 | DEBUG    | src.agent.infrastructure.mongo.service:close:227 - Closed MongoDB connection.
+2025-08-26 00:51:45.177 | INFO     | __main__:test_mongodb_connection:39 - Checking std_profiles collection...
+2025-08-26 00:51:47.147 | INFO     | src.agent.infrastructure.mongo.service:__init__:71 - Connected to MongoDB instance:
+ URI: mongodb+srv://bilalburney14:3780353783@cluster0.v6ydmco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+ Database: fyp_data
+ Collection: std_profiles
+2025-08-26 00:51:47.310 | INFO     | __main__:test_mongodb_connection:45 - ✓ std_profiles collection has 200 documents
+2025-08-26 00:51:47.310 | INFO     | __main__:test_mongodb_connection:53 - Testing document retrieval...
+2025-08-26 00:51:47.467 | DEBUG    | src.agent.infrastructure.mongo.service:fetch_documents:168 - Fetched 1 documents with query: {}, offset: 0, limit: 1
+2025-08-26 00:51:47.468 | INFO     | __main__:test_mongodb_connection:57 - ✓ Sample document structure valid
+2025-08-26 00:51:47.469 | DEBUG    | __main__:test_mongodb_connection:58 - Sample title: AI-Powered Fraud Detection in E-commerce
+2025-08-26 00:51:47.469 | DEBUG    | __main__:test_mongodb_connection:59 - Sample domain: Artificial Intelligence
+2025-08-26 00:51:47.625 | DEBUG    | src.agent.infrastructure.mongo.service:close:227 - Closed MongoDB connection.
+2025-08-26 00:51:47.625 | SUCCESS  | __main__:test_mongodb_connection:63 - ✅ MongoDB connection test passed
