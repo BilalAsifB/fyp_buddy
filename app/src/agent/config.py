@@ -53,6 +53,14 @@ class Settings(BaseSettings):
         description="Connection URI for MongoDB Atlas", 
         alias="mongodb_uri"
     )
+
+    # --- CORS Configuration ---
+    CORS_ORIGINS: str = Field(
+        default="*",
+        description="Comma-separated list of allowed origins for CORS",
+        alias="cors_origins"
+    )
+
 # Initialize settings
 try:
     settings = Settings()
