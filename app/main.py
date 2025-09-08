@@ -16,14 +16,6 @@ from rq import Queue
 # Import your config
 from src.agent.config import settings
 
-# ---------------------------------------------------
-# Configure LangSmith Tracing
-# ---------------------------------------------------
-os.environ["LANGCHAIN_TRACING_V2"] = settings.LANGSMITH_TRACING
-os.environ["LANGCHAIN_ENDPOINT"] = settings.LANGSMITH_ENDPOINT
-os.environ["LANGCHAIN_API_KEY"] = settings.LANGSMITH_API_KEY
-os.environ["LANGCHAIN_PROJECT"] = settings.LANGSMITH_PROJECT
-
 # Import LangGraph chain
 from src.agent.application.agents.chains.connection_finding_chain import (
     connection_finding_chain
@@ -39,6 +31,14 @@ from src.agent.domain.fyp_data import Fyp_data
 from src.agent.domain.metadata import Metadata
 from src.agent.domain.match_state import Match_State
 from src.agent.infrastructure.mongo.service import MongoDBService
+
+# ---------------------------------------------------
+# Configure LangSmith Tracing
+# ---------------------------------------------------
+os.environ["LANGCHAIN_TRACING_V2"] = settings.LANGSMITH_TRACING
+os.environ["LANGCHAIN_ENDPOINT"] = settings.LANGSMITH_ENDPOINT
+os.environ["LANGCHAIN_API_KEY"] = settings.LANGSMITH_API_KEY
+os.environ["LANGCHAIN_PROJECT"] = settings.LANGSMITH_PROJECT
 
 # ---------------------------------------------------
 # Logging
@@ -252,6 +252,15 @@ async def get_stats():
     except Exception as e:
         logger.error(f"❌ Error in /stats: {e}")
         raise HTTPException(status_code=500, detail="Failed to get stats")
+
+@app.get("/redis_ping", tags=["Debug"])
+def redis_ping():
+    """Debug endpoint to check Redis connectivity"""
+    try:
+        pong = redis_conn.ping()
+        return {"ok": True, "pong": pong}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
 
 
 # ---------------------------------------------------

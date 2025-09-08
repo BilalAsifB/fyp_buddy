@@ -1,100 +1,83 @@
 #!/usr/bin/env python3
-"""
-Match Finding Agent Test - Tests the match finding endpoint on Azure
-"""
-
 import sys
 import asyncio
 import traceback
-from pathlib import Path
 from loguru import logger
 import httpx
+import time
 
-# Configure logger
+AZURE_BACKEND_URL = "https://fyp-backend.ashygrass-953f1123.centralindia.azurecontainerapps.io"
+
 logger.remove()
 logger.add(sys.stdout, level="INFO")
 logger.add("test_match_agent_azure.log", level="DEBUG")
 
-# Change this to your Azure backend URL
-AZURE_BACKEND_URL = "https://fyp-backend.ashygrass-953f1123.centralindia.azurecontainerapps.io/find_matches"
-
-
 async def test_match_agent_azure():
-    """Test the match finding agent on Azure deployment"""
     logger.info("🎯 Testing Match Finding Agent on Azure...")
 
-    try:
-        # Sample query profile (same structure as your local Fyp_data model)
-        query_profile = {
+    query_profile = {
+        "id": "22K-4114",
+        "title": "AI-Powered Healthcare Diagnosis System",
+        "domain": "Healthcare AI",
+        "idea": "Develop an AI system that can assist doctors in diagnosing diseases from medical imaging and patient symptoms using machine learning algorithms and computer vision techniques.",
+        "tech_stack": ["Python", "TensorFlow", "OpenCV", "Flask", "MongoDB"],
+        "interests": ["Artificial Intelligence", "Healthcare", "Machine Learning", "Computer Vision"],
+        "score": 0.0,
+        "metadata": {
             "id": "22K-4114",
-            "title": "AI-Powered Healthcare Diagnosis System",
-            "domain": "Healthcare AI",
-            "idea": "Develop an AI system that can assist doctors in diagnosing diseases from medical imaging and patient symptoms using machine learning algorithms and computer vision techniques.",
-            "tech_stack": ["Python", "TensorFlow", "OpenCV", "Flask", "MongoDB"],
-            "interests": ["Artificial Intelligence", "Healthcare", "Machine Learning", "Computer Vision"],
-            "score": 0.0,
-            "metadata": {
-                "id": "22K-4114",
-                "department": "Artificial Intelligence",
-                "year": 2022,
-                "gpa": 3.5,
-                "gender": "female",
-                "skills": ["Python", "Machine Learning", "Deep Learning", "TensorFlow", "OpenCV"],
-                "email": "test.query@nu.edu.pk"
-            }
+            "department": "Artificial Intelligence",
+            "year": 2022,
+            "gpa": 3.5,
+            "gender": "female",
+            "skills": ["Python", "Machine Learning", "Deep Learning", "TensorFlow", "OpenCV"],
+            "email": "test.query@nu.edu.pk"
         }
+    }
 
-        logger.info("Sending request to Azure backend...")
+    try:
         async with httpx.AsyncClient(timeout=60.0) as client:
-            response = await client.post(AZURE_BACKEND_URL, json=query_profile)
+            # Step 1: enqueue match job
+            logger.info("📤 Sending request to /find_matches...")
+            response = await client.post(f"{AZURE_BACKEND_URL}/find_matches", json=query_profile)
+            response.raise_for_status()
+            job_resp = response.json()
+            job_id = job_resp["job_id"]
+            logger.info(f"✅ Job enqueued with ID {job_id}")
 
-        if response.status_code != 200:
-            raise Exception(f"Backend returned status {response.status_code}: {response.text}")
+            # Step 2: poll until done
+            for attempt in range(30):  # up to ~30 * 2s = 60s
+                status_resp = await client.get(f"{AZURE_BACKEND_URL}/find_matches/{job_id}")
+                status_resp.raise_for_status()
+                status_data = status_resp.json()
 
-        result = response.json()
-        logger.info("✓ Response received from Azure backend")
+                if status_data["status"] == "done":
+                    logger.success("✅ Match job finished")
+                    result = status_data["result"]
+                    matches = result or []
+                    logger.info(f"Found {len(matches)} matches")
 
-        # Validate response structure
-        if "all_data" not in result:
-            raise Exception("Response missing 'all_data' field")
+                    for i, match in enumerate(matches[:3]):
+                        score = match.get("score", "N/A")
+                        logger.info(f"  {i+1}. {match.get('title')} | Score: {score}")
 
-        if "results" not in result:
-            raise Exception("Response missing 'results' field")
+                    return True
 
-        matches = result["all_data"]
-        if not matches:
-            logger.warning("⚠️ No matches found")
-            return True
+                elif status_data["status"] == "error":
+                    raise Exception(f"Job failed: {status_data['error']}")
 
-        logger.info(f"✓ Found {len(matches)} matches")
+                logger.info(f"⏳ Still processing... (attempt {attempt+1})")
+                await asyncio.sleep(2)
 
-        # Log top matches
-        logger.info("Top Matches:")
-        for i, match in enumerate(matches[:3]):  # Show top 3
-            score = match.get("score", "N/A")
-            logger.info(f"  {i+1}. {match.get('title')}")
-            logger.info(f"     Domain: {match.get('domain')}")
-            logger.info(f"     Score: {score}")
-            if "interests" in match:
-                common_interests = set(query_profile["interests"]) & set(match["interests"])
-                if common_interests:
-                    logger.info(f"     Shared interests: {', '.join(common_interests)}")
-
-        logger.success(f"✅ Match finding test passed - Found {len(matches)} matches")
-        return True
+            raise TimeoutError("Job did not complete in time")
 
     except Exception as e:
-        logger.error(f"❌ Match finding test failed: {e}")
-        logger.error("Full traceback:")
+        logger.error(f"❌ Test failed: {e}")
         logger.error(traceback.format_exc())
         return False
 
 
 def main():
-    """Main function to run the async test"""
     return asyncio.run(test_match_agent_azure())
 
-
 if __name__ == "__main__":
-    success = main()
-    sys.exit(0 if success else 1)
+    sys.exit(0 if main() else 1)
