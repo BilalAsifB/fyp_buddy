@@ -54,6 +54,22 @@ class Settings(BaseSettings):
         alias="mongodb_uri"
     )
 
+    # --- Redis Configuration ---
+    REDIS_HOST: str = Field(
+        default="localhost",
+        description="Redis host for background job queue",
+        alias="redis_host"
+    )
+    REDIS_PORT: int = Field(
+        default=6379,
+        description="Redis port for background job queue",
+        alias="redis_port"
+    )
+
+    REDIS_PASSWORD: str | None = Field(default=None, alias="redis_password")
+    
+    REDIS_SSL: bool = Field(default=False, alias="redis_ssl")
+
     # --- CORS Configuration ---
     CORS_ORIGINS: str = Field(
         default="*",

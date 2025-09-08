@@ -16,7 +16,7 @@ logger.add(sys.stdout, level="INFO")
 logger.add("test_match_agent_azure.log", level="DEBUG")
 
 # Change this to your Azure backend URL
-AZURE_BACKEND_URL = "https://fyp-backend.ashygrass-9.centralindia.azurecontainerapps.io/find_matches"
+AZURE_BACKEND_URL = "https://fyp-backend.ashygrass-953f1123.centralindia.azurecontainerapps.io/find_matches"
 
 
 async def test_match_agent_azure():

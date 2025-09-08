@@ -1,12 +1,17 @@
 # main.py
 import os
+import json
 import logging
+from uuid import uuid4
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ValidationError
 from typing import List
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+
+import redis
+from rq import Queue
 
 # Import your config
 from src.agent.config import settings
@@ -63,15 +68,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# ---------------------------------------------------
+# Redis + RQ setup
+# ---------------------------------------------------
+def get_redis_connection():
+    return redis.Redis(
+        host=settings.REDIS_HOST,
+        port=settings.REDIS_PORT,
+        password=settings.REDIS_PASSWORD,
+        ssl=settings.REDIS_SSL,
+        decode_responses=True,
+    )
+
+
+redis_conn = get_redis_connection()
+queue = Queue("matches", connection=redis_conn)
+
+
 # ---------------------------------------------------
 # Schemas
 # ---------------------------------------------------
 class ProjectRequest(BaseModel):
     domain: str
 
+
 class InterestRequest(BaseModel):
     student_id: str
     interests: List[str]
+
 
 class MetadataRequest(BaseModel):
     id: str
@@ -81,6 +106,8 @@ class MetadataRequest(BaseModel):
     gender: str
     skills: List[str]
     email: str
+
+
 class MatchRequest(BaseModel):
     id: str
     title: str
@@ -102,12 +129,29 @@ class UserIngestionRequest(BaseModel):
     score: float
     metadata: MetadataRequest
 
+
+# ---------------------------------------------------
+# Background worker
+# ---------------------------------------------------
+def run_match_agent(job_id: str, initial_state: Match_State):
+    logger.info(f"🚀 Running match agent for job {job_id}...")
+    try:
+        result = match_agent.invoke(initial_state)
+        matches = result.get("all_data", [])
+
+        payload = {"status": "done", "result": jsonable_encoder(matches)}
+        redis_conn.set(job_id, json.dumps(payload))
+        logger.info(f"✅ Job {job_id} completed with {len(matches)} matches")
+    except Exception as e:
+        logger.error(f"❌ Job {job_id} failed: {e}")
+        redis_conn.set(job_id, json.dumps({"status": "error", "error": str(e)}))
+
+
 # ---------------------------------------------------
 # Routes
 # ---------------------------------------------------
 @app.get("/", tags=["Health"])
 def health_check():
-    """Health check endpoint for monitoring."""
     logger.info("✅ Health check called")
     return {"status": "ok", "service": "LangGraph API"}
 
@@ -121,6 +165,7 @@ async def generate_project(req: ProjectRequest):
     except Exception as e:
         logger.error(f"❌ Error in /generate_project: {e}")
         raise HTTPException(status_code=500, detail="Project generation failed")
+
 
 @app.post("/generate_interests", tags=["Interests"])
 async def generate_interests(req: InterestRequest):
@@ -136,58 +181,51 @@ async def generate_interests(req: InterestRequest):
         logger.error(f"❌ Error in /generate_interests: {e}")
         raise HTTPException(status_code=500, detail="Interest generation failed")
 
+
 @app.post("/find_matches", tags=["Matching"])
 async def find_matches(req: MatchRequest):
+    """Enqueue a match-finding job and return job_id."""
     try:
         logger.info(f"📥 /find_matches request: {req.json()}")
+        job_id = str(uuid4())
 
-        # Convert request → Fyp_data
         query_metadata = Metadata(**req.metadata.dict())
         query_data = Fyp_data(
-            id=req.id,
-            title=req.title,
-            domain=req.domain,
-            idea=req.idea,
-            tech_stack=req.tech_stack,
-            interests=req.interests,
-            score=req.score,
+            id=req.id, title=req.title, domain=req.domain,
+            idea=req.idea, tech_stack=req.tech_stack,
+            interests=req.interests, score=req.score,
             metadata=query_metadata,
         )
 
-        # logger.debug(query_data)
-
-        # # Call LangGraph agent
-        # result = match_agent.invoke({query_data.dict()})
         initial_state = Match_State(
-            all_data=[],
-            query=query_data,
-            done=False,
-            offset=0,
-            limit=25,
-            results={},
+            all_data=[], query=query_data, done=False,
+            offset=0, limit=25, results={},
             chain=connection_finding_chain()
         )
 
-        result = match_agent.invoke(initial_state)
+        # enqueue background job
+        queue.enqueue(run_match_agent, job_id, initial_state)
+        redis_conn.set(job_id, json.dumps({"status": "processing"}))
 
-        matches = result.get("all_data", [])
-        logger.info(f"📤 /find_matches response: {matches}")
-
-        matches_json = jsonable_encoder(matches)
-        logger.info(f"📤 /find_matches JSON response: {matches_json}")
-
-        return {"success": True, "result": matches_json}
+        return {"success": True, "job_id": job_id, "status": "processing"}
     except Exception as e:
         logger.error(f"❌ Error in /find_matches: {e}")
         raise HTTPException(status_code=500, detail="Match finding failed")
 
+
+@app.get("/find_matches/{job_id}", tags=["Matching"])
+async def get_match_status(job_id: str):
+    """Check the status or result of a match-finding job."""
+    job_data = redis_conn.get(job_id)
+    if not job_data:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return json.loads(job_data)
+
+
 @app.post("/ingest_user", tags=["Users"])
 async def ingest_user(req: UserIngestionRequest):
-    """Ingest user data into MongoDB collection."""
     try:
         logger.info(f"📥 /ingest_user request: {req.json()}")
-
-        # Convert request → Fyp_data model
         metadata = Metadata(**req.metadata.dict())
         user_data = Fyp_data(
             id=req.id, title=req.title, domain=req.domain,
@@ -195,28 +233,26 @@ async def ingest_user(req: UserIngestionRequest):
             interests=req.interests, score=req.score,
             metadata=metadata
         )
-        
         with MongoDBService(model=Fyp_data, collection_name="std_profiles") as service:
             service.ingest_documents([user_data])
-        
         logger.info(f"✅ Successfully ingested user data for ID: {req.id}")
         return {"success": True, "message": "User data ingested successfully"}
     except Exception as e:
         logger.error(f"❌ Error in /ingest_user: {e}")
         raise HTTPException(status_code=500, detail="User ingestion failed")
 
+
 @app.get("/stats", tags=["Stats"])
 async def get_stats():
-    """Get database statistics."""
     try:
         with MongoDBService(model=Fyp_data, collection_name="std_profiles") as service:
             count = service.get_collection_count()
-        
         logger.info(f"📊 Stats requested, total profiles = {count}")
         return {"success": True, "total_profiles": count}
     except Exception as e:
         logger.error(f"❌ Error in /stats: {e}")
         raise HTTPException(status_code=500, detail="Failed to get stats")
+
 
 # ---------------------------------------------------
 # Global error handler
