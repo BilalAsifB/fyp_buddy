@@ -65,10 +65,8 @@ class Settings(BaseSettings):
         description="Redis port for background job queue",
         alias="redis_port"
     )
-
+    REDIS_USERNAME: str | None = Field(default=None, alias="redis_username")
     REDIS_PASSWORD: str | None = Field(default=None, alias="redis_password")
-    
-    REDIS_SSL: bool = Field(default=False, alias="redis_ssl")
 
     # --- CORS Configuration ---
     CORS_ORIGINS: str = Field(
