@@ -35,7 +35,7 @@ async def test_match_agent_azure():
     }
 
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=600) as client:
             # Step 1: enqueue match job
             logger.info("📤 Sending request to /find_matches...")
             response = await client.post(f"{AZURE_BACKEND_URL}/find_matches", json=query_profile)

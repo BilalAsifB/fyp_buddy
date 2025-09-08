@@ -1,6 +1,23 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis:7.0-alpine
+    container_name: redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - fyp-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - redis-data:/data
+
   fyp-backend:
     build: 
       context: .
@@ -17,9 +34,9 @@ services:
       - LANGSMITH_ENDPOINT=${LANGSMITH_ENDPOINT:-https://api.smith.langchain.com}
       - LANGSMITH_PROJECT=${LANGSMITH_PROJECT:-fyp-agent-api}
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
+      - REDIS_URL=redis://redis:6379/0
       - PORT=8000
     volumes:
-      # Mount .env file if it exists locally (for development)
       - ./.env:/app/.env:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
@@ -30,6 +47,10 @@ services:
     restart: unless-stopped
     networks:
       - fyp-network
+    
+volumes:
+  redis-data: 
+    driver: local
 
 networks:
   fyp-network:
