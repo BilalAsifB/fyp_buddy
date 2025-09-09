@@ -68,7 +68,6 @@ class Settings(BaseSettings):
     REDIS_USERNAME: str | None = Field(default=None, alias="redis_username")
     REDIS_PASSWORD: str | None = Field(default=None, alias="redis_password")
     REDIS_URL: str = Field(
-        default=f"redis://:{REDIS_PASSWORD or ''}@{REDIS_HOST}:{REDIS_PORT}/0",
         description="Full Redis URL",
         alias="redis_url"
     )
