@@ -4,7 +4,6 @@ import asyncio
 import traceback
 from loguru import logger
 import httpx
-import time
 
 AZURE_BACKEND_URL = "https://fyp-backend.ashygrass-953f1123.centralindia.azurecontainerapps.io"
 
@@ -14,6 +13,24 @@ logger.add("test_match_agent_azure.log", level="DEBUG")
 
 async def test_match_agent_azure():
     logger.info("🎯 Testing Match Finding Agent on Azure...")
+
+    # Step 0: Redis health check
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            logger.info("🩺 Checking Redis health...")
+            health_resp = await client.get(f"{AZURE_BACKEND_URL}/redis_ping")
+            health_resp.raise_for_status()
+            health_data = health_resp.json()
+
+            if health_data.get("status") != "healthy":
+                logger.error(f"❌ Redis unhealthy: {health_data}")
+                return False
+            else:
+                logger.success("✅ Redis is healthy")
+    except Exception as e:
+        logger.error(f"❌ Redis health check failed: {e}")
+        logger.error(traceback.format_exc())
+        return False
 
     query_profile = {
         "id": "22K-4114",
@@ -44,19 +61,18 @@ async def test_match_agent_azure():
             job_id = job_resp["job_id"]
             logger.info(f"✅ Job enqueued with ID {job_id}")
 
-            # Step 2: poll until done
-            for attempt in range(30):  # up to ~30 * 2s = 60s
+            # Step 2: poll until done (max ~2 minutes)
+            for attempt in range(60):
                 status_resp = await client.get(f"{AZURE_BACKEND_URL}/find_matches/{job_id}")
                 status_resp.raise_for_status()
                 status_data = status_resp.json()
 
                 if status_data["status"] == "done":
                     logger.success("✅ Match job finished")
-                    result = status_data["result"]
-                    matches = result or []
-                    logger.info(f"Found {len(matches)} matches")
+                    result = status_data["result"] or []
+                    logger.info(f"Found {len(result)} matches")
 
-                    for i, match in enumerate(matches[:3]):
+                    for i, match in enumerate(result[:3]):
                         score = match.get("score", "N/A")
                         logger.info(f"  {i+1}. {match.get('title')} | Score: {score}")
 
