@@ -6,10 +6,9 @@ services:
     container_name: redis-app
     command: [
       "redis-server",
-      "--requirepass",
-      "${REDIS_PASSWORD:-localdevpassword}",
-      "--appendonly",
-      "yes"
+      "--requirepass", "${REDIS_PASSWORD:-localdevpassword}",
+      "--appendonly", "yes",
+      "--bind", "0.0.0.0"
     ]
     ports:
       - "${REDIS_PORT:-6379}:6379"
@@ -17,7 +16,7 @@ services:
     networks:
       - fyp-network
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-localdevpassword}", "ping"]
+      test: ["CMD", "redis-cli", "-h", "127.0.0.1", "-a", "${REDIS_PASSWORD:-localdevpassword}", "ping"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -45,9 +44,9 @@ services:
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
       - REDIS_USERNAME=${REDIS_USERNAME}
       - REDIS_PASSWORD=${REDIS_PASSWORD:-localdevpassword}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_URL=${REDIS_URL}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_URL=${REDIS_URL:-redis://:${REDIS_PASSWORD:-localdevpassword}@redis:6379/0}
       - PORT=8000
     volumes:
       - ./.env:/app/.env:ro
@@ -58,6 +57,9 @@ services:
       retries: 3
       start_period: 40s
     restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
     networks:
       - fyp-network
     
