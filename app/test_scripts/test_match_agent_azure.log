@@ -545,3 +545,15 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
 httpx.HTTPStatusError: Server error '500 Internal Server Error' for url 'https://fyp-backend.ashygrass-953f1123.centralindia.azurecontainerapps.io/find_matches'
 For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
 
+2025-09-09 14:50:41.490 | INFO     | __main__:test_match_agent_azure:16 - 🎯 Testing Match Finding Agent on Azure...
+2025-09-09 14:50:41.581 | INFO     | __main__:test_match_agent_azure:40 - 📤 Sending request to /find_matches...
+2025-09-09 14:52:07.622 | ERROR    | __main__:test_match_agent_azure:74 - ❌ Test failed: Server error '500 Internal Server Error' for url 'https://fyp-backend.ashygrass-953f1123.centralindia.azurecontainerapps.io/find_matches'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+2025-09-09 14:52:07.624 | ERROR    | __main__:test_match_agent_azure:75 - Traceback (most recent call last):
+  File "/home/bilal/fyp_buddy/app/test_scripts/test_backend.py", line 42, in test_match_agent_azure
+    response.raise_for_status()
+  File "/home/bilal/fyp_buddy/app/.venv/lib/python3.12/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Server error '500 Internal Server Error' for url 'https://fyp-backend.ashygrass-953f1123.centralindia.azurecontainerapps.io/find_matches'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+
