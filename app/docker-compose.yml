@@ -6,9 +6,14 @@ services:
     container_name: redis-app
     command: [
       "redis-server",
-      "--requirepass", "${REDIS_PASSWORD:-localdevpassword}",
-      "--appendonly", "yes",
-      "--bind", "0.0.0.0"
+      "--requirepass",
+      "IXlWyyzSGN8TAINDe7Spg0U6GbIH5cyl",
+      "--bind",
+      "0.0.0.0",
+      "--port",
+      "6379",
+      "--protected-mode",
+      "no"
     ]
     ports:
       - "${REDIS_PORT:-6379}:6379"
