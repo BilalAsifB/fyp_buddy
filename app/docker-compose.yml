@@ -3,20 +3,23 @@ version: '3.8'
 services:
   redis:
     image: redis:7.0-alpine
-    container_name: redis
-    command: redis-server --appendonly yes
+    container_name: redis-app
+    command: redis-server --requirepass ${REDIS_PASSWORD:-localdevpassword} --appendonly yes
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     restart: unless-stopped
     networks:
       - fyp-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-localdevpassword}", "ping"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 5s
     volumes:
       - redis-data:/data
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-localdevpassword}
 
   fyp-backend:
     build: 
@@ -34,7 +37,6 @@ services:
       - LANGSMITH_ENDPOINT=${LANGSMITH_ENDPOINT:-https://api.smith.langchain.com}
       - LANGSMITH_PROJECT=${LANGSMITH_PROJECT:-fyp-agent-api}
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
-      - REDIS_URL=redis://redis:6379/0
       - PORT=8000
     volumes:
       - ./.env:/app/.env:ro

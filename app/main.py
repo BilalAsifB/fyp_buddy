@@ -1,5 +1,6 @@
 # main.py
 import os
+import time
 import json
 import logging
 from uuid import uuid4
@@ -79,6 +80,11 @@ def get_redis_connection():
         decode_responses=True,
         username=settings.REDIS_USERNAME,
         password=settings.REDIS_PASSWORD,
+        socket_connect_timeout=10,
+        socket_timeout=10,
+        retry_on_timeout=True,
+        health_check_interval=30,
+        max_connections=20,
     )
 
 
@@ -255,12 +261,41 @@ async def get_stats():
 
 @app.get("/redis_ping", tags=["Debug"])
 def redis_ping():
-    """Debug endpoint to check Redis connectivity"""
+    """Enhanced Redis connectivity check"""
     try:
+        start_time = time.time()
         pong = redis_conn.ping()
-        return {"ok": True, "pong": pong}
+        response_time = time.time() - start_time
+        
+        # Test write/read operation
+        test_key = f"health_check_{uuid4()}"
+        redis_conn.set(test_key, "test_value", ex=10)
+        test_value = redis_conn.get(test_key)
+        redis_conn.delete(test_key)
+        
+        return {
+            "status": "healthy",
+            "ping": pong,
+            "response_time_ms": round(response_time * 1000, 2),
+            "write_read_test": test_value == "test_value",
+            "redis_info": {
+                "host": settings.REDIS_HOST,
+                "port": settings.REDIS_PORT,
+                "connected_clients": redis_conn.info().get("connected_clients", "N/A"),
+                "used_memory_human": redis_conn.info().get("used_memory_human", "N/A"),
+                "db_size": redis_conn.dbsize()
+            }
+        }
     except Exception as e:
-        return {"ok": False, "error": str(e)}
+        logger.error(f"Redis health check failed: {e}")
+        return {
+            "status": "unhealthy", 
+            "error": str(e),
+            "redis_config": {
+                "host": settings.REDIS_HOST,
+                "port": settings.REDIS_PORT
+            }
+        }
 
 
 # ---------------------------------------------------
