@@ -6,3 +6,6 @@
 
 __pycache__/
 *.pyc
+
+# Ignore Azure Container App Redis configuration
+redis-app.yaml
