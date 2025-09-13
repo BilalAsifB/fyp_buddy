@@ -264,7 +264,7 @@ Located in `app/test_scripts/` with 8 comprehensive tests:
 ## 🔮 Future Enhancements
 
 ### Planned Features
-- **Multi-Language Support**: International university adoption
+- **Connecting groups with supervisors**: teams can find their supervisors
 - **Advanced Analytics**: Team success prediction
 - **Integration APIs**: LMS and university system integration
 - **Mobile Application**: Native iOS/Android apps
@@ -273,7 +273,8 @@ Located in `app/test_scripts/` with 8 comprehensive tests:
 - **Personality Matching**: Myers-Briggs compatibility
 - **Learning Style Analysis**: Complementary learning approaches
 - **Success Prediction**: Historical team performance analysis
-- **Dynamic Re-matching**: Mid-project team adjustments
+- **Agent to work on project ideas**: Coming up and refining project ideas
+- **Agent to act as another member**: Will be the 4th member of the project
 
 ## 🤝 Contributing
 
