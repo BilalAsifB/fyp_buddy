@@ -1,101 +1,108 @@
 # FYP Agent Test Scripts
 
-This directory contains comprehensive test scripts for the FYP (Final Year Project) LangGraph Agent system.
-
-## 📁 Directory Structure
-
-```
-app/test_scripts/
-├── test_config.py           # Configuration and environment variables test
-├── test_mongodb.py          # MongoDB connection and data test
-├── test_project_agent.py    # Project generation agent test
-├── test_interest_agent.py   # Interest generation agent test
-├── test_match_agent.py      # Match finding agent test
-├── test_error_handling.py   # Error handling and edge cases test
-├── run_all_tests.py         # Master test runner
-└── README.md               # This file
-```
+Comprehensive test suite for the FYP BUDDY LangGraph Agent system. These scripts validate all core functionality including database connections, agent graphs, and error handling.
 
 ## 🚀 Quick Start
 
-### Run All Tests
+### Run All Tests (Recommended)
 ```bash
 cd app/test_scripts/
 python run_all_tests.py
 ```
+**Duration:** 15-25 minutes | **Output:** Console + JSON report
 
 ### Run Individual Tests
 ```bash
-# Test configuration
-python test_config.py
-
-# Test MongoDB connection
-python test_mongodb.py
-
-# Test project generation agent
-python test_project_agent.py
-
-# Test interest generation agent
-python test_interest_agent.py
-
-# Test match finding agent
-python test_match_agent.py
-
-# Test error handling
-python test_error_handling.py
+python test_config.py          # < 1 second
+python test_mongodb.py         # < 5 seconds  
+python test_project_agent.py   # 5-10 minutes
+python test_interest_agent.py  # 5-10 minutes
+python test_match_agent.py     # 2-5 minutes
+python test_error_handling.py  # < 30 seconds
+python test_backend.py         # 2-5 minutes (Azure backend)
 ```
 
-## 📋 Test Descriptions
+## 📋 Test Overview
 
-### 1. Configuration Test (`test_config.py`)
-- ✅ Verifies all required environment variables are set
-- ✅ Checks GROQ_API_KEY, LANGSMITH_API_KEY, MONGODB_URI, etc.
-- ⚠️ **Prerequisites**: Valid `.env` file with API keys
+| Test | Purpose | Duration | Prerequisites |
+|------|---------|----------|---------------|
+| **Configuration** | Validates environment variables and API keys | < 1s | `.env` file |
+| **MongoDB** | Tests database connection and data availability | < 5s | MongoDB running |
+| **Project Agent** | Tests project generation with LLM | 5-10m | API keys |
+| **Interest Agent** | Tests interest profile generation | 5-10m | API keys |
+| **Match Agent** | Tests partner matching algorithm | 2-5m | Database with data |
+| **Error Handling** | Tests graceful error recovery | < 30s | None |
+| **Backend** | Tests deployed Azure backend | 2-5m | None |
 
-### 2. MongoDB Test (`test_mongodb.py`)
-- ✅ Tests MongoDB connection
-- ✅ Checks `std_profiles` collection availability
-- ✅ Validates document retrieval
-- ⚠️ **Prerequisites**: MongoDB instance running and accessible
+## ⚙️ Prerequisites
 
-### 3. Project Generation Agent Test (`test_project_agent.py`)
-- ✅ Tests project generation graph compilation
-- ✅ Validates generated project structure
-- ✅ Checks metadata completeness and constraints
-- ✅ Verifies project uniqueness and variety
-- ⚠️ **Prerequisites**: Valid GROQ and LangSmith API keys
-- ⏱️ **Duration**: 5-10 minutes (due to API rate limiting)
+**Required Environment Variables:**
+```bash
+GROQ_API_KEY=your_groq_api_key
+LANGSMITH_API_KEY=your_langsmith_api_key  
+MONGODB_URI=your_mongodb_connection_string
+MONGODB_DATABASE_NAME=fyp_buddy
+```
 
-### 4. Interest Generation Agent Test (`test_interest_agent.py`)
-- ✅ Tests interest generation graph compilation
-- ✅ Validates generated interest profiles
-- ✅ Checks metadata structure and constraints
-- ✅ Verifies profile uniqueness
-- ⚠️ **Prerequisites**: Valid GROQ and LangSmith API keys
-- ⏱️ **Duration**: 5-10 minutes (due to API rate limiting)
+**Database Setup:**
+- MongoDB running locally or Atlas connection
+- For match testing: Run project/interest generation first to populate data
 
-### 5. Match Finding Agent Test (`test_match_agent.py`)
-- ✅ Tests match finding graph with sample query
-- ✅ Validates match results and scoring
-- ✅ Checks result sorting and structure
-- ⚠️ **Prerequisites**: Database with existing profiles
-- ⏱️ **Duration**: 2-5 minutes
+**Dependencies:**
+```bash
+cd app/
+pip install -r requirements.txt
+```
 
-### 6. Error Handling Test (`test_error_handling.py`)
-- ✅ Tests invalid input handling
-- ✅ Tests database connection errors
-- ✅ Tests empty database scenarios
-- ✅ Validates graceful error recovery
+## 📊 Understanding Results
 
-## 📊 Test Output
+### ✅ Success Indicators
+- **100% pass rate** = All systems working
+- **80-99% pass rate** = Minor issues, mostly functional
+- **< 80% pass rate** = Major issues requiring attention
 
-### Console Output
-- Real-time test progress with colored logging
-- Individual test results (✅ PASS / ❌ FAIL)
-- Final summary with success rates
+### Common Outcomes
+- **Empty database warnings** = Normal if you haven't generated profiles yet
+- **API rate limiting delays** = Expected behavior, tests handle this automatically
+- **GPA/gender validation warnings** = Non-critical data quality notices
 
-### Log Files
-Each test creates its own log file:
+## 🐛 Troubleshooting
+
+### Configuration Errors
+```bash
+Missing required settings: ['GROQ_API_KEY']
+```
+**Fix:** Check your `.env` file contains all required API keys
+
+### Database Connection Failed
+```bash
+pymongo.errors.ServerSelectionTimeoutError
+```
+**Fix:** Verify MongoDB is running and connection string is correct
+
+### Import Errors
+```bash
+ModuleNotFoundError: No module named 'agent'
+```
+**Fix:** Run from `app/test_scripts/` directory, scripts auto-adjust Python path
+
+### No Matches Found
+```bash
+No matches found - database is empty
+```
+**Fix:** Run `python test_project_agent.py` first to populate the database
+
+### Rate Limiting
+```bash
+groq.RateLimitError: Rate limit exceeded
+```
+**Fix:** Tests include delays, but you may need to wait between runs
+
+## 📁 Output Files
+
+The tests generate several output files:
+
+**Log Files** (detailed debugging):
 - `test_config.log`
 - `test_mongodb.log`
 - `test_project_agent.log`
@@ -104,131 +111,84 @@ Each test creates its own log file:
 - `test_error_handling.log`
 - `run_all_tests.log`
 
-### Test Report
-- `test_report_YYYYMMDD_HHMMSS.json` - Comprehensive JSON report with all test data
+**Test Report** (comprehensive results):
+- `test_report_YYYYMMDD_HHMMSS.json`
 
-## ⚠️ Prerequisites
+## 🎯 Test Details
 
-Before running tests, ensure you have:
+### Configuration Test
+Verifies all required environment variables are present and valid.
 
-1. **Environment Variables Set**:
-   ```bash
-   GROQ_API_KEY=your_groq_api_key
-   LANGSMITH_API_KEY=your_langsmith_api_key
-   MONGODB_URI=your_mongodb_connection_string
-   MONGODB_DATABASE_NAME=fyp_buddy
-   ```
+### MongoDB Test
+Tests database connectivity and checks for existing data. Warns if `std_profiles` collection is empty.
 
-2. **MongoDB Running**:
-   - Local MongoDB instance, or
-   - MongoDB Atlas connection
+### Project Agent Test
+Generates 100 unique project profiles using LLM. Validates structure, uniqueness, and metadata constraints.
 
-3. **Dependencies Installed**:
-   ```bash
-   cd app/
-   pip install -r requirements.txt  # or however you manage dependencies
-   ```
+### Interest Agent Test  
+Generates 100 unique interest profiles. Tests variety and proper data structure.
 
-4. **Database with Data** (for match testing):
-   - Run project or interest generation first to populate the database
-   - Or ensure `std_profiles` collection has sample data
+### Match Agent Test
+Uses a sample query to find compatible partners. Tests scoring algorithm and result ranking.
 
-## 🐛 Troubleshooting
+### Error Handling Test
+Tests system behavior with invalid inputs, connection failures, and edge cases.
 
-### Common Issues
+### Backend Test
+Tests the deployed Azure backend API endpoints and Redis functionality.
 
-1. **Import Errors**:
-   ```
-   ModuleNotFoundError: No module named 'agent'
-   ```
-   - **Solution**: Make sure you're running from `app/test_scripts/` directory
-   - The scripts automatically adjust the Python path
+## 🔧 Customization
 
-2. **API Rate Limiting**:
-   ```
-   groq.RateLimitError: Rate limit exceeded
-   ```
-   - **Solution**: Tests include built-in delays, but you may need to wait longer between runs
+### Modify Test Parameters
+Edit individual test files to customize:
+```python
+# Change number of generated profiles
+PROFILES_TO_GENERATE = 50  # Default: 100
 
-3. **MongoDB Connection Failed**:
-   ```
-   pymongo.errors.ServerSelectionTimeoutError
-   ```
-   - **Solution**: Check MongoDB is running and connection string is correct
+# Modify test query
+query_profile = Fyp_data(
+    title="Your Custom Test Project",
+    # ... customize as needed
+)
+```
 
-4. **Empty Database**:
-   ```
-   No matches found - database is empty
-   ```
-   - **Solution**: Run project/interest generation agents first to populate data
-
-5. **Missing API Keys**:
-   ```
-   Missing required settings: ['GROQ_API_KEY']
-   ```
-   - **Solution**: Check your `.env` file and environment variables
+### Add Custom Validations
+```python
+# Add your validation logic in any test
+if your_custom_condition:
+    logger.info("✓ Custom validation passed")
+    passed_tests += 1
+```
 
 ### Debug Mode
-For more detailed output, check the individual log files or modify the logging level in any test script:
-
+For more detailed output:
 ```python
 logger.add(sys.stdout, level="DEBUG")  # Change INFO to DEBUG
 ```
 
-## 🎯 Expected Results
+## 💡 Best Practices
 
-### Healthy System
-- All 6 tests should pass (100% success rate)
-- Project/Interest generation should create 100 unique profiles each
-- Match agent should find and rank matches appropriately
+1. **Start with `run_all_tests.py`** - Gives complete system health overview
+2. **Check logs for warnings** - Non-critical issues that might need attention  
+3. **Run individual tests for debugging** - Focus on specific failing components
+4. **Populate database first** - Run project/interest generation before match testing
+5. **Monitor API usage** - Tests make multiple LLM calls, be aware of rate limits
+
+## 📈 Expected Performance
+
+**Healthy System Indicators:**
+- All tests pass (100% success rate)
+- Project/Interest agents generate 100 unique profiles each
+- Match agent finds and ranks results appropriately
 - No critical errors in logs
+- Total runtime: 15-25 minutes
 
-### Acceptable Issues
-- Warnings about GPA/gender values outside expected ranges (non-critical)
-- Empty database warnings (if you haven't populated data yet)
-- Rate limiting delays (expected behavior)
-
-### Critical Issues
+**System Issues:**
 - Configuration errors (missing API keys)
-- MongoDB connection failures
-- Import/module errors
-- LLM chain compilation failures
+- Database connection failures  
+- LLM chain compilation errors
+- Multiple test failures (>20%)
 
-## 📈 Performance Expectations
+---
 
-| Test | Expected Duration | Memory Usage | API Calls |
-|------|------------------|--------------|-----------|
-| Configuration | < 1 second | Minimal | 0 |
-| MongoDB | < 5 seconds | Low | 0 |
-| Project Agent | 5-10 minutes | Medium | ~5-10 |
-| Interest Agent | 5-10 minutes | Medium | ~5-10 |
-| Match Agent | 2-5 minutes | Medium | Variable |
-| Error Handling | < 30 seconds | Low | 1-2 |
-
-**Total Expected Duration**: 15-25 minutes for all tests
-
-## 🔧 Customization
-
-You can modify individual tests by:
-
-1. **Changing test parameters**:
-   ```python
-   # In test_match_agent.py
-   query_profile = Fyp_data(
-       title="Your Custom Test Project",
-       # ... modify as needed
-   )
-   ```
-
-2. **Adjusting timeouts**:
-   ```python
-   # In run_all_tests.py
-   timeout=1200  # 20 minutes instead of 10
-   ```
-
-3. **Adding custom validations**:
-   ```python
-   # Add your own validation logic in any test
-   if custom_condition:
-       logger.info("✓ Custom validation passed")
-   ```
+**Need Help?** Check individual log files for detailed error information or review the troubleshooting section above.
