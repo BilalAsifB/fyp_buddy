@@ -1,4 +1,4 @@
-# FYP Agent Test Scripts
+# FYP BUDDY Backend Test Scripts
 
 Comprehensive test suite for the FYP BUDDY LangGraph Agent system. These scripts validate all core functionality including database connections, agent graphs, and error handling.
 
